@@ -26,7 +26,7 @@ class ItemListState extends State<ItemList> {
   final listKey = GlobalKey<AnimatedListState>();
 
   @override
-  void initState() {
+  void initState(){
     searchController.addListener(() {
       searchIndices = new List<int>();
       setState(() {
