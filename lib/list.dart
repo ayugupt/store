@@ -3,6 +3,8 @@ import 'package:storemanager/model/cloud_firebase.dart';
 
 final Firestore_service firestore_service= new Firestore_service();
 
+import 'package:storemanager/constants.dart';
+
 class ItemList extends StatefulWidget {
   ItemListState createState() => ItemListState();
 }
@@ -10,7 +12,14 @@ class ItemList extends StatefulWidget {
 class ItemListState extends State<ItemList> {
   List<String> itemNameList = new List<String>();
   List<String> itemQuantityList = new List<String>();
+  List<String> itemCategory = new List<String>();
+
+  String selectedOption;
+
   List<int> searchIndices;
+
+  List<String> categories = <String>["General", "Groceries", "Electronics"];
+
   TextEditingController itemName = new TextEditingController();
   TextEditingController itemQuantity = new TextEditingController();
   TextEditingController searchController = new TextEditingController();
@@ -19,7 +28,6 @@ class ItemListState extends State<ItemList> {
 
   @override
   void initState() async {
-
     searchController.addListener(() {
       searchIndices = new List<int>();
       setState(() {
@@ -71,7 +79,13 @@ class ItemListState extends State<ItemList> {
                       child: ListTile(
                         leading: Text("${index + 1}"),
                         title: Text(itemNameList[index]),
-                        trailing: Text(itemQuantityList[index]),
+                        trailing: Column(
+                          children: <Widget>[
+                            Text(itemQuantityList[index]),
+                            Text(itemCategory[index])
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.center,
+                        ),
                         onTap: () {
                           int choice = -1;
                           showModalBottomSheet(
@@ -129,7 +143,7 @@ class ItemListState extends State<ItemList> {
                                               child: Text(
                                                 "Done",
                                                 style: TextStyle(
-                                                    color: Colors.blue),
+                                                    color: kPrimaryColor),
                                               ),
                                               onPressed: () {
                                                 if (qControl.text != '') {
@@ -141,7 +155,7 @@ class ItemListState extends State<ItemList> {
                                               child: Text(
                                                 "Cancel",
                                                 style: TextStyle(
-                                                    color: Colors.blue),
+                                                    color: kPrimaryColor),
                                               ),
                                               onPressed: () {
                                                 Navigator.pop(ct, false);
@@ -172,7 +186,7 @@ class ItemListState extends State<ItemList> {
                                           child: Text(
                                             "Yes",
                                             style:
-                                                TextStyle(color: Colors.blue),
+                                                TextStyle(color: kPrimaryColor),
                                           ),
                                           onPressed: () {
                                             Navigator.pop(c, true);
@@ -182,7 +196,7 @@ class ItemListState extends State<ItemList> {
                                           child: Text(
                                             "No",
                                             style:
-                                                TextStyle(color: Colors.blue),
+                                                TextStyle(color: kPrimaryColor),
                                           ),
                                           onPressed: () {
                                             Navigator.pop(c, false);
@@ -199,6 +213,7 @@ class ItemListState extends State<ItemList> {
                                   setState(() {
                                     itemNameList.removeAt(index);
                                     itemQuantityList.removeAt(index);
+                                    itemCategory.removeAt(index);
                                   });
                                 }
                               });
@@ -223,7 +238,13 @@ class ItemListState extends State<ItemList> {
                     child: ListTile(
                       leading: Text("${index + 1}"),
                       title: Text(itemNameList[searchIndices[index]]),
-                      trailing: Text(itemQuantityList[searchIndices[index]]),
+                      trailing: Column(
+                        children: <Widget>[
+                          Text(itemQuantityList[searchIndices[index]]),
+                          Text(itemCategory[searchIndices[index]])
+                        ],
+                        mainAxisAlignment: MainAxisAlignment.center,
+                      ),
                       onTap: () {
                         int choice = -1;
                         showModalBottomSheet(
@@ -280,8 +301,8 @@ class ItemListState extends State<ItemList> {
                                           FlatButton(
                                             child: Text(
                                               "Done",
-                                              style:
-                                                  TextStyle(color: Colors.blue),
+                                              style: TextStyle(
+                                                  color: kPrimaryColor),
                                             ),
                                             onPressed: () {
                                               if (qControl.text != '') {
@@ -292,8 +313,8 @@ class ItemListState extends State<ItemList> {
                                           FlatButton(
                                             child: Text(
                                               "Cancel",
-                                              style:
-                                                  TextStyle(color: Colors.blue),
+                                              style: TextStyle(
+                                                  color: kPrimaryColor),
                                             ),
                                             onPressed: () {
                                               Navigator.pop(ct, false);
@@ -324,7 +345,8 @@ class ItemListState extends State<ItemList> {
                                       FlatButton(
                                         child: Text(
                                           "Yes",
-                                          style: TextStyle(color: Colors.blue),
+                                          style:
+                                              TextStyle(color: kPrimaryColor),
                                         ),
                                         onPressed: () {
                                           Navigator.pop(c, true);
@@ -333,7 +355,8 @@ class ItemListState extends State<ItemList> {
                                       FlatButton(
                                         child: Text(
                                           "No",
-                                          style: TextStyle(color: Colors.blue),
+                                          style:
+                                              TextStyle(color: kPrimaryColor),
                                         ),
                                         onPressed: () {
                                           Navigator.pop(c, false);
@@ -343,11 +366,11 @@ class ItemListState extends State<ItemList> {
                                   );
                                 }).then((pop) {
                               if (pop) {
-                                
                                 setState(() {
                                   itemNameList.removeAt(searchIndices[index]);
                                   itemQuantityList
                                       .removeAt(searchIndices[index]);
+                                  itemCategory.removeAt(searchIndices[index]);
                                   searchIndices.removeAt(index);
                                 });
                               }
@@ -429,31 +452,63 @@ class ItemListState extends State<ItemList> {
                                 Navigator.pop(c, true);
                               }
                             },
-                          )),
-                          Expanded(
-                              child: FlatButton(
-                            child: Text("Cancel",
-                                style: TextStyle(color: Colors.blue)),
-                            onPressed: () {
-                              Navigator.pop(c, false);
+                            itemBuilder: (BuildContext cnt) {
+                              return categories.map((category) {
+                                return PopupMenuItem<String>(
+                                  child: Text(category),
+                                  value: category,
+                                );
+                              }).toList();
                             },
-                          ))
-                        ],
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      )
-                    ],
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)));
+                            child: Text(selectedOption == null
+                                ? "Choose category"
+                                : selectedOption),
+                          ),
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Expanded(
+                                child: FlatButton(
+                              child: Text(
+                                "Done",
+                                style: TextStyle(color: kPrimaryColor),
+                              ),
+                              onPressed: () {
+                                if (itemName.text != '' &&
+                                    itemQuantity.text != '' &&
+                                    selectedOption != null) {
+                                  Navigator.pop(c, true);
+                                }
+                              },
+                            )),
+                            Expanded(
+                                child: FlatButton(
+                              child: Text("Cancel",
+                                  style: TextStyle(color: kPrimaryColor)),
+                              onPressed: () {
+                                Navigator.pop(c, false);
+                              },
+                            ))
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        )
+                      ],
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)));
+                });
               }).then((pop) {
             if (pop == true) {
               listKey.currentState.insertItem(itemNameList.length);
+              itemCategory.add(selectedOption);
               itemNameList.add(itemName.text);
               itemQuantityList.add(itemQuantity.text);
             }
+            selectedOption = null;
             itemName.text = '';
             itemQuantity.text = '';
           });
         },
+        backgroundColor: kPrimaryColor,
       ),
       appBar: AppBar(
         title: Text("Stock"),
@@ -501,7 +556,8 @@ class ItemListState extends State<ItemList> {
               width: MediaQuery.of(context).size.width * 0.6,
               height: AppBar().preferredSize.height * 0.6,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20), color: Colors.white),
+                  borderRadius: BorderRadius.circular(20),
+                  color: kPrimaryLightColor),
             )),
             padding: EdgeInsets.only(
                 right: MediaQuery.of(context).size.width * 0.02),
