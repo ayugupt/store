@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:storemanager/model/cloud_firebase.dart';
+
+final Firestore_service firestore_service= new Firestore_service();
 
 class ItemList extends StatefulWidget {
   ItemListState createState() => ItemListState();
@@ -7,19 +10,16 @@ class ItemList extends StatefulWidget {
 class ItemListState extends State<ItemList> {
   List<String> itemNameList = new List<String>();
   List<String> itemQuantityList = new List<String>();
-
   List<int> searchIndices;
-
   TextEditingController itemName = new TextEditingController();
   TextEditingController itemQuantity = new TextEditingController();
-
   TextEditingController searchController = new TextEditingController();
   FocusNode searchFocus = new FocusNode();
-
   final listKey = GlobalKey<AnimatedListState>();
 
   @override
-  void initState() {
+  void initState() async {
+
     searchController.addListener(() {
       searchIndices = new List<int>();
       setState(() {
@@ -366,6 +366,7 @@ class ItemListState extends State<ItemList> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
+          firestore_service.Get_Item_Name();
           setState(() {
             searchController.text = '';
           });
@@ -419,7 +420,10 @@ class ItemListState extends State<ItemList> {
                               "Done",
                               style: TextStyle(color: Colors.blue),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
+                              firestore_service.Add_Item_Data(itemName.text,itemQuantity.text);
+                              var x=await firestore_service.Get_Item_Name();
+                              print(x);
                               if (itemName.text != '' &&
                                   itemQuantity.text != '') {
                                 Navigator.pop(c, true);
