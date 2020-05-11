@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:storemanager/model/cloud_firebase.dart';
+
+final Firestore_service firestore_service= new Firestore_service();
 
 import 'package:storemanager/constants.dart';
 
@@ -19,14 +22,12 @@ class ItemListState extends State<ItemList> {
 
   TextEditingController itemName = new TextEditingController();
   TextEditingController itemQuantity = new TextEditingController();
-
   TextEditingController searchController = new TextEditingController();
   FocusNode searchFocus = new FocusNode();
-
   final listKey = GlobalKey<AnimatedListState>();
 
   @override
-  void initState(){
+  void initState() async {
     searchController.addListener(() {
       searchIndices = new List<int>();
       setState(() {
@@ -388,61 +389,68 @@ class ItemListState extends State<ItemList> {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
+          firestore_service.Get_Item_Name();
           setState(() {
             searchController.text = '';
           });
           showDialog(
               context: context,
               builder: (BuildContext c) {
-                return StatefulBuilder(builder: (context, setState) {
-                  return SimpleDialog(
-                      title: Text("Enter Name and Quantity of item:"),
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Align(
-                                child: Container(
-                              child: TextField(
-                                controller: itemName,
-                                decoration: InputDecoration(
-                                    hintText: "Item Name",
-                                    hintStyle: TextStyle(
-                                        fontSize:
-                                            MediaQuery.of(c).size.width * 0.03),
-                                    border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20))),
-                              ),
-                              width: MediaQuery.of(c).size.width * 0.35,
-                            )),
-                            Align(
-                                child: Container(
-                              child: TextField(
-                                controller: itemQuantity,
-                                decoration: InputDecoration(
-                                    hintText: "Item Quantity",
-                                    hintStyle: TextStyle(
-                                        fontSize:
-                                            MediaQuery.of(c).size.width * 0.03),
-                                    border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(20))),
-                              ),
-                              width: MediaQuery.of(c).size.width * 0.35,
-                            ))
-                          ],
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(c).size.height * 0.02,
-                        ),
-                        Center(
-                          child: PopupMenuButton<String>(
-                            initialValue: selectedOption,
-                            onSelected: (selected) {
-                              setState(() {
-                                selectedOption = selected;
-                              });
+                return SimpleDialog(
+                    title: Text("Enter Name and Quantity of item:"),
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Align(
+                              child: Container(
+                            child: TextField(
+                              controller: itemName,
+                              decoration: InputDecoration(
+                                  hintText: "Item Name",
+                                  hintStyle: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(c).size.width * 0.03),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20))),
+                            ),
+                            width: MediaQuery.of(c).size.width * 0.35,
+                          )),
+                          Align(
+                              child: Container(
+                            child: TextField(
+                              controller: itemQuantity,
+                              decoration: InputDecoration(
+                                  hintText: "Item Quantity",
+                                  hintStyle: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(c).size.width * 0.03),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20))),
+                            ),
+                            width: MediaQuery.of(c).size.width * 0.35,
+                          ))
+                        ],
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(c).size.height * 0.02,
+                      ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                              child: FlatButton(
+                            child: Text(
+                              "Done",
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                            onPressed: () async {
+                              firestore_service.Add_Item_Data(itemName.text,itemQuantity.text);
+                              var x=await firestore_service.Get_Item_Name();
+                              print(x);
+                              if (itemName.text != '' &&
+                                  itemQuantity.text != '') {
+                                Navigator.pop(c, true);
+                              }
                             },
                             itemBuilder: (BuildContext cnt) {
                               return categories.map((category) {
