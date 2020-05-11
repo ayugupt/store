@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../Signup/components/body.dart';
 
 class NewScreen extends StatefulWidget {
+
   @override
   _NewScreenState createState() => _NewScreenState();
 }
@@ -15,33 +16,38 @@ class _NewScreenState extends State<NewScreen> {
   String imageUrl;
   String email;
 
-  @override
+@override
   void initState() {
     super.initState();
 
-    getCurrentUser().then((_) {
+    getCurrentUser().then((_){
       start();
+
     });
   }
 
-  Future<void> getCurrentUser() async {
+  Future<void> getCurrentUser() async{
     try {
+
       final user = await _auth.currentUser();
       print("user is ${user == null ? "null" : "Not null"}");
+
 
       if (user != null) {
         loggedInUser = user;
       }
-    } catch (e) {
+    }  catch(e) {
       print('hi ' + e);
     }
   }
 
-  List start() {
-    name = loggedInUser.displayName;
-    //email = loggedInUser.email;
-    setState(() {});
-    return [name, email];
+    List start() {
+     name = loggedInUser.displayName;
+     email = loggedInUser.email;
+     setState(() {
+
+     });
+    return [name , email];
   }
 
   @override
@@ -102,7 +108,7 @@ class _NewScreenState extends State<NewScreen> {
                 onPressed: () {
 //                  signOutGoogle();
 //                  Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) {return LoginPage();}), ModalRoute.withName('/'));
-                },
+               },
                 color: Colors.deepPurple,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),

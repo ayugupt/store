@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:storemanager/constants.dart';
+import 'package:flutter_auth/constants.dart';
 
 class ItemList extends StatefulWidget {
   ItemListState createState() => ItemListState();
