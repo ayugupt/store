@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:storemanager/Screens/Login/components/background.dart';
-import 'package:storemanager/Screens/Signup/signup_screen.dart';
-import 'package:storemanager/components/already_have_an_account_acheck.dart';
-import 'package:storemanager/components/rounded_button.dart';
-import 'package:storemanager/components/rounded_input_field.dart';
-import 'package:storemanager/components/rounded_password_field.dart';
+import 'package:flutter_auth/Screens/Login/components/background.dart';
+import 'package:flutter_auth/Screens/Signup/signup_screen.dart';
+import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
+import 'package:flutter_auth/components/rounded_button.dart';
+import 'package:flutter_auth/components/rounded_input_field.dart';
+import 'package:flutter_auth/components/rounded_password_field.dart';
 import 'package:flutter_svg/svg.dart';
 
 class Body extends StatelessWidget {

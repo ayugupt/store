@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:storemanager/constants.dart';
-import 'package:storemanager/listview.dart';
-import 'package:storemanager/model/cloud_firebase.dart';
+import 'package:flutter_auth/constants.dart';
+import 'package:flutter_auth/listview.dart';
+import 'package:flutter_auth/model/cloud_firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 Firestore_service firestore_service = new Firestore_service();

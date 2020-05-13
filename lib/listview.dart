@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:storemanager/model/cloud_firebase.dart';
+import 'model/cloud_firebase.dart';
 import 'constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_auth/constants.dart';
 
 Firestore_service firestore_service = new Firestore_service();
 
@@ -13,6 +15,31 @@ class Listv extends StatefulWidget {
 }
 
 class _ListvState extends State<Listv> {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String name;
+  String email;
+  FirebaseUser loggedInUser;
+
+  Future<void> getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser();
+      print("user is ${user == null ? "null" : "Not null"}");
+
+      if (user != null) {
+        loggedInUser = user;
+      }
+    } catch (e) {
+      print('hi ' + e);
+    }
+  }
+
+  List start() {
+    name = loggedInUser.displayName;
+    email = loggedInUser.email;
+    setState(() {});
+    return [name, email];
+  }
   TextEditingController itemName = new TextEditingController();
   String selectedOption;
 
@@ -36,6 +63,9 @@ class _ListvState extends State<Listv> {
   List<DocumentSnapshot> searchResults;
 
   void initState() {
+    getCurrentUser().then((_) {
+      start();
+    });
     searchController.addListener(() {
       searchResults = new List<DocumentSnapshot>();
       setState(() {
@@ -151,17 +181,25 @@ class _ListvState extends State<Listv> {
   Widget _buildList(BuildContext context, DocumentSnapshot document) {
     if (document['Item Name'] != null ||
         document['Item Quantity'] != null ||
-        document['Item Category'] != null) {
+        document['Item Category'] != null||document['Item Price'] != null||document['Item Expiry'] != null) {
       return Padding(
         child: Container(
             child: ListTile(
-              title: Text(document.data["Item Name"]),
+              title:Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                 Text("Item name-"+document.data["Item Name"]),
+                  Text("Price Rs-"+document.data["Item Price"]),
+                  Text("Expiry Date-"+document.data["Item Expiry"]),
+                ],
+              ),
               trailing: Column(
                 children: <Widget>[
-                  Text(document['Item Quantity']),
-                  Text(document['Item Category'])
+                  Text("Quantity-  "+document['Item Quantity']),
+                  Text("Category- "+document['Item Category']),
                 ],
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
               ),
               onTap: () {
                 String ClickedItemDocumentId = document.documentID;
@@ -551,7 +589,7 @@ class _ListvState extends State<Listv> {
                 }).then((pop) {
               if (pop) {
                 firestore_service.Add_Item_Data(
-                    itemName.text, itemQuantity.text, selectedOption);
+                    itemName.text, itemQuantity.text, selectedOption,itemPrice.text,itemExpiry.text);
               }
               itemName.text = '';
               itemQuantity.text = '';

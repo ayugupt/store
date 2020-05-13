@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:storemanager/Screens/Welcome/welcome_screen.dart';
-import 'package:storemanager/constants.dart';
+import 'package:flutter_auth/Screens/Welcome/welcome_screen.dart';
+import 'package:flutter_auth/constants.dart';
 import 'listview.dart';
-import 'package:storemanager/pages/profilepage.dart';
+import 'package:flutter_auth/pages/profilepage.dart';
 
 void main() => runApp(MyApp());
 

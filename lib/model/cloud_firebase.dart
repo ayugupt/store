@@ -4,11 +4,11 @@ import 'package:flutter/cupertino.dart';
 class Firestore_service {
   static final Firestore db = Firestore.instance;
 
-  Future<void> Add_Item_Data(String ItemName, String ItemQuantity,String ItemCategory) async {
+  Future<void> Add_Item_Data(String ItemName, String ItemQuantity,String ItemCategory,String ItemPrice,String ItemExpiry) async {
     //QuerySnapshot querySnapshot = await db.collection("Shop 1").getDocuments();
     //int itemnumber=querySnapshot.documents.length+1;
     db.collection('Shop Id').document()
-        .setData({'Item Name': ItemName, 'Item Quantity': ItemQuantity,"Item Category":ItemCategory});
+        .setData({'Item Name': ItemName, 'Item Quantity': ItemQuantity,"Item Category":ItemCategory,"Item Price":ItemPrice,"Item Expiry":ItemExpiry});
   }
 
   void Delete_Item(String ClickedItemName) async{
