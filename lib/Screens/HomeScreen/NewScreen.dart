@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../Signup/components/body.dart';
 
 class NewScreen extends StatefulWidget {
   @override

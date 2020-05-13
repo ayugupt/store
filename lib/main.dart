@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:storemanager/Screens/Welcome/welcome_screen.dart';
 import 'package:storemanager/constants.dart';
+import 'listview.dart';
+import 'package:storemanager/pages/profilepage.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,7 +17,7 @@ class MyApp extends StatelessWidget {
         primaryColor: kPrimaryColor,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: WelcomeScreen(),
+      home: Profile(),
     );
   }
 }
