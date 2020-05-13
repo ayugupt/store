@@ -16,22 +16,13 @@ class AuthService {
 
   AuthService() {
     //user = Observable(_auth.onAuthStateChanged);
-
   }
 
-  Future<FirebaseUser> googleSignInn() async{
+  Future<FirebaseUser> googleSignInn() async {}
 
-  }
+  void updateUserData(FirebaseUser user) async {}
 
-  void updateUserData(FirebaseUser user) async{
-
-  }
-
-  void signOut() {
-
-  }
-
+  void signOut() {}
 }
-
 
 final AuthService authService = AuthService();

@@ -1,5 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auth/Screens/HomeScreen/NewScreen.dart';
 import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/Screens/Signup/components/background.dart';
 import 'package:flutter_auth/Screens/Signup/components/or_divider.dart';
@@ -8,19 +8,16 @@ import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/components/rounded_button.dart';
 import 'package:flutter_auth/components/rounded_input_field.dart';
 import 'package:flutter_auth/components/rounded_password_field.dart';
-import 'package:flutter_auth/list.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_auth/listview.dart';
 
 class Body extends StatefulWidget {
-
   @override
   _BodyState createState() => _BodyState();
 }
 
 class _BodyState extends State<Body> {
-
   String name;
   String email;
   String imageUrl;
@@ -28,19 +25,19 @@ class _BodyState extends State<Body> {
 
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
-  Future<FirebaseUser> _signIn() async{
+  Future<FirebaseUser> _signIn() async {
     try {
       GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
-      GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount
-          .authentication;
+      GoogleSignInAuthentication googleSignInAuthentication =
+          await googleSignInAccount.authentication;
 
       final AuthCredential credential = GoogleAuthProvider.getCredential(
         idToken: googleSignInAuthentication.idToken,
         accessToken: googleSignInAuthentication.accessToken,
       );
 
-      final AuthResult authResult = await _auth.signInWithCredential(
-          credential);
+      final AuthResult authResult =
+          await _auth.signInWithCredential(credential);
       final FirebaseUser user = authResult.user;
       assert(!user.isAnonymous);
       assert(await user.getIdToken() != null);
@@ -56,13 +53,9 @@ class _BodyState extends State<Body> {
       assert(user.uid == currentUser.uid);
 
       return authResult.user;
-    }
-    catch(e)
-    {
+    } catch (e) {
       print(e);
-
     }
-
   }
 
   @override
@@ -115,10 +108,10 @@ class _BodyState extends State<Body> {
                 SocalIcon(
                   iconSrc: "assets/icons/google-plus.svg",
                   press: () {
-
                     _signIn().whenComplete(() {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context){
-                        return ItemList();
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return (Listv());
                       }));
                     });
                   },

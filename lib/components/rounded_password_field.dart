@@ -4,6 +4,7 @@ import 'package:flutter_auth/constants.dart';
 
 class RoundedPasswordField extends StatelessWidget {
   final ValueChanged<String> onChanged;
+
   const RoundedPasswordField({
     Key key,
     this.onChanged,

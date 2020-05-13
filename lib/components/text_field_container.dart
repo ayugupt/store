@@ -3,6 +3,7 @@ import 'package:flutter_auth/constants.dart';
 
 class TextFieldContainer extends StatelessWidget {
   final Widget child;
+
   const TextFieldContainer({
     Key key,
     this.child,

@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 class SocalIcon extends StatelessWidget {
   final String iconSrc;
   final Function press;
+
   const SocalIcon({
     Key key,
     this.iconSrc,

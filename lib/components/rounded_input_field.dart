@@ -6,6 +6,7 @@ class RoundedInputField extends StatelessWidget {
   final String hintText;
   final IconData icon;
   final ValueChanged<String> onChanged;
+
   const RoundedInputField({
     Key key,
     this.hintText,
