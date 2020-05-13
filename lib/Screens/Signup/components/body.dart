@@ -102,23 +102,22 @@ class _BodyState extends State<Body> {
             ),
             OrDivider(),
             Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  SocalIcon(
-                      iconSrc: "assets/icons/google-plus.svg",
-                      press: () {
-                        _signIn().then(
-                          (user) {
-                            print(user);
-                            Navigator.of(context)
-                                .push(MaterialPageRoute(builder: (context) {
-                              return Listv();
-                            }));
-                          },
-                        );
-                      })
-                ])
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                SocalIcon(
+                  iconSrc: "assets/icons/google-plus.svg",
+                  press: () {
+                    _signIn().whenComplete(() {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return (Listv());
+                      }));
+                    });
+                  },
+                ),
+              ],
+            )
           ],
         ),
       ),
