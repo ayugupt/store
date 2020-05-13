@@ -8,6 +8,43 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:889697305790:android:70cba2650897ed10fe4aef",
+        "android_client_info": {
+          "package_name": "com.example.basic_ui"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "889697305790-72afgpemcaf5j3r9r2vdtn0erb7nbs6i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.basic_ui",
+            "certificate_hash": "23bd3400ebbc361be41b5d3bcdadbcba7b345e94"
+          }
+        },
+        {
+          "client_id": "889697305790-mks6fqeg8av78e479h9h8uk5ev47e9tr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCccNBOsuTsiRma6rVLu6GcevKk0E-3ryM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "889697305790-mks6fqeg8av78e479h9h8uk5ev47e9tr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:889697305790:android:6959faf21315298bfe4aef",
         "android_client_info": {
           "package_name": "com.example.flutter_auth"

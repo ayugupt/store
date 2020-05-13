@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_auth/constants.dart';
 
 class ItemList extends StatefulWidget {
@@ -7,6 +8,36 @@ class ItemList extends StatefulWidget {
 }
 
 class ItemListState extends State<ItemList> {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String name;
+  String email;
+  FirebaseUser loggedInUser;
+  Future<void> getCurrentUser() async{
+    try {
+
+      final user = await _auth.currentUser();
+      print("user is ${user == null ? "null" : "Not null"}");
+
+
+      if (user != null) {
+        loggedInUser = user;
+      }
+    }  catch(e) {
+      print('hi ' + e);
+    }
+  }
+
+  List start() {
+    name = loggedInUser.displayName;
+    email = loggedInUser.email;
+    setState(() {
+
+    });
+    return [name , email];
+  }
+
+
   List<String> itemNameList = new List<String>();
   List<String> itemQuantityList = new List<String>();
   List<String> itemCategory = new List<String>();
@@ -27,6 +58,10 @@ class ItemListState extends State<ItemList> {
 
   @override
   void initState(){
+
+    getCurrentUser().then((_){
+      start();
+    });
     searchController.addListener(() {
       searchIndices = new List<int>();
       setState(() {
