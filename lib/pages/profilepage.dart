@@ -4,6 +4,8 @@ import 'package:flutter_auth/listview.dart';
 import 'package:flutter_auth/model/cloud_firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'dart:convert';
+
 Firestore_service firestore_service = new Firestore_service();
 
 class Profile extends StatefulWidget {
@@ -73,13 +75,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   tabs: <Widget>[
                     Tab(
                       child: Text(
-                        "Stock",
+                        "Details",
                         style: TextStyle(color: kPrimaryColor),
                       ),
                     ),
                     Tab(
                       child: Text(
-                        "Details",
+                        "Stock",
                         style: TextStyle(color: kPrimaryColor),
                       ),
                     )
@@ -96,7 +98,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           },
           body: TabBarView(
             controller: tabController,
-            children: <Widget>[gridItems(), details()],
+            children: <Widget>[details(), gridItems()],
           )),
       backgroundColor: Colors.grey[200],
     );
@@ -135,6 +137,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   }
 
   Widget gridItems() {
+    double fontSize = MediaQuery.of(context).size.width*0.035;
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3, childAspectRatio: 1),
@@ -143,30 +146,103 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         return Align(
             child: Container(
           child: Card(
-            child: Center(
-                child: Column(children: <Widget>[
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.01,
+            child: Stack(children: <Widget>[
+              Container(
+                height: MediaQuery.of(context).size.width * 0.19,
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [kPrimaryLightColor, kPrimaryColor],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight)),
               ),
-              Text(
-                itemData[index]["Item Name"],
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.05,
-              ),
-              Text(
-                itemData[index]["Item Category"],
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.03,
-              ),
-              Text(
-                itemData[index]["Item Quantity"],
-                style: TextStyle(fontWeight: FontWeight.bold),
-              )
-            ])),
+              Center(
+                  child: Column(children: <Widget>[
+                SizedBox(
+                  height: MediaQuery.of(context).size.width * 0.008,
+                ),
+                Text(
+                  itemData[index]["Item Name"],
+                  style: TextStyle(fontSize: fontSize),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.width * 0.008,
+                ),
+                Text(
+                  "Rs.${itemData[index]["Item Price"]}",
+                  style: TextStyle(fontSize: fontSize),
+                ),
+                Text(
+                  itemData[index]["Item Expiry"],
+                  style: TextStyle(fontSize: fontSize),
+                ),
+                Text(
+                  itemData[index]["Item Category"],
+                  style: TextStyle(fontSize: fontSize),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.width * 0.01,
+                ),
+                Text(
+                  "Quantity",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: fontSize),
+                  
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      child: FloatingActionButton(
+                        child: Icon(
+                          Icons.remove,
+                          color: Colors.black,
+                        ),
+                        onPressed: () {
+                          String quantityString =
+                              itemData[index]["Item Quantity"];
+                          int currentQuantityInt = int.parse(quantityString);
+                          currentQuantityInt != 0
+                              ? currentQuantityInt--
+                              : currentQuantityInt = currentQuantityInt;
+                          quantityString = currentQuantityInt.toString();
+                          firestore_service.Update_Item(
+                              itemData[index].documentID, quantityString);
+                        },
+                        backgroundColor: Colors.grey[100],
+                        elevation: 2,
+                      ),
+                      width: MediaQuery.of(context).size.width * 0.06,
+                      height: MediaQuery.of(context).size.width * 0.06,
+                    ),
+                    Text(
+                      itemData[index]["Item Quantity"],
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width * 0.04),
+                    ),
+                    Container(
+                      child: FloatingActionButton(
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.black,
+                        ),
+                        onPressed: () {
+                          String quantityString =
+                              itemData[index]["Item Quantity"];
+                          int currentQuantityInt = int.parse(quantityString);
+                          currentQuantityInt++;
+                          quantityString = currentQuantityInt.toString();
+                          firestore_service.Update_Item(
+                              itemData[index].documentID, quantityString);
+                        },
+                        backgroundColor: Colors.grey[100],
+                        elevation: 2,
+                      ),
+                      width: MediaQuery.of(context).size.width * 0.06,
+                      height: MediaQuery.of(context).size.width * 0.06,
+                    )
+                  ],
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                )
+              ]))
+            ]),
           ),
           width: MediaQuery.of(context).size.width * 0.33,
           height: MediaQuery.of(context).size.width * 0.33,
