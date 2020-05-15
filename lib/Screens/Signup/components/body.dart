@@ -8,9 +8,11 @@ import 'package:flutter_auth/components/already_have_an_account_acheck.dart';
 import 'package:flutter_auth/components/rounded_button.dart';
 import 'package:flutter_auth/components/rounded_input_field.dart';
 import 'package:flutter_auth/components/rounded_password_field.dart';
+import 'package:flutter_auth/pages/profilepage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_auth/listview.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Body extends StatefulWidget {
   @override
@@ -21,10 +23,14 @@ class _BodyState extends State<Body> {
   String name;
   String email;
   String imageUrl;
+  var user;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
+  getCurrentUser() async{
+    user = await _auth.currentUser();
+  }
   Future<FirebaseUser> _signIn() async {
     try {
       GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
@@ -35,7 +41,6 @@ class _BodyState extends State<Body> {
         idToken: googleSignInAuthentication.idToken,
         accessToken: googleSignInAuthentication.accessToken,
       );
-
       final AuthResult authResult =
           await _auth.signInWithCredential(credential);
       final FirebaseUser user = authResult.user;
@@ -58,6 +63,17 @@ class _BodyState extends State<Body> {
     }
   }
 
+  Future<int> getUser() async{
+    var isThere = await Firestore.instance.collection('users').where('email', isEqualTo: user.email).getDocuments();
+    var num = isThere.documents.length;
+    return num;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+  }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -108,12 +124,30 @@ class _BodyState extends State<Body> {
                 SocalIcon(
                   iconSrc: "assets/icons/google-plus.svg",
                   press: () {
-                    _signIn().whenComplete(() {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (context) {
-                        return (Listv());
-                      }));
-                    });
+                    try{
+                      _signIn().whenComplete(() async{
+                        var num = await getUser();
+                        if(num == 0) {
+                          Firestore.instance.collection('users').add({
+                            'name': name,
+                            'email': user.email,
+                            'shopName': null,
+                            "address": null,
+                            'phone_no': null,
+                          });
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return (Profile());
+                          }));
+                        }
+                        else{
+                          googleSignIn.signOut();
+                          print('Account Already Exists');
+                        }
+                      });
+                    }catch(e){
+                      print(e);
+                    }
                   },
                 ),
               ],
