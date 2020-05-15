@@ -93,6 +93,17 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   }
 
   @override
+  void dispose() {
+    searchController.dispose();
+    searchFocus.dispose();
+    itemName.dispose();
+    itemQuantity.dispose();
+    itemExpiry.dispose();
+    itemPrice.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: NestedScrollView(
@@ -149,7 +160,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 ),
                 title: Text(
                   "My Profile",
-                  style: TextStyle(color: kPrimaryColor),
+                  style: TextStyle(
+                      color: kPrimaryColor,
+                      fontSize: MediaQuery.of(context).size.width * 0.036),
                 ),
               ),
             ];
