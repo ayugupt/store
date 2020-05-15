@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/model/cloud_firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 Firestore_service firestore_service = new Firestore_service();
 
 class Profile extends StatefulWidget {
@@ -9,6 +11,31 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String Username;
+  String Useremail;
+  FirebaseUser loggedInUser;
+
+  Future<void> getCurrentUser() async {
+    try {
+      final user = await _auth.currentUser();
+      print("user is ${user == null ? "null" : "User name-"+user.displayName}");
+
+      if (user != null) {
+        loggedInUser = user;
+      }
+    } catch (e) {
+      print('hi ' + e);
+    }
+  }
+  List start() {
+    Username = loggedInUser.displayName;
+    Useremail = loggedInUser.email;
+    setState(() {});
+    return [Username, Useremail];
+  }
+
   TabController tabController;
 
   List<DocumentSnapshot> itemData = new List<DocumentSnapshot>();
@@ -40,6 +67,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
+    getCurrentUser().then((_) {
+      start();
+    });
     Firestore.instance.collection("Shops Details").document("ShopID").snapshots().listen((shopdata) {
       setState(() {
         var ShopData = shopdata.data;
