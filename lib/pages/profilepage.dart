@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/constants.dart';
-import 'package:flutter_auth/listview.dart';
 import 'package:flutter_auth/model/cloud_firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'dart:convert';
-
 Firestore_service firestore_service = new Firestore_service();
 
 class Profile extends StatefulWidget {
@@ -16,6 +12,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   TabController tabController;
 
   List<DocumentSnapshot> itemData = new List<DocumentSnapshot>();
+
   bool gotData = false;
 
   String name, shopName, number, address;
@@ -39,12 +36,18 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   List<DocumentSnapshot> searchResults;
 
+
+
   @override
   void initState() {
-    profileData["Shop Name"] = null;
-    profileData["Name"] = null;
-    profileData["Number"] = null;
-    profileData["Address"] = null;
+    Firestore.instance.collection("Shops Details").document("ShopID").snapshots().listen((shopdata) {
+      setState(() {
+        var ShopData = shopdata.data;
+        profileData["Shop Name"] =ShopData["Shop Name"];
+        profileData["Name"] = ShopData["Name"];
+        profileData["Number"] = ShopData["Number"];
+        profileData["Address"] = ShopData["Address"];      });
+    });
 
     tabController = new TabController(length: 2, initialIndex: 0, vsync: this);
 
@@ -701,6 +704,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                                 TextStyle(color: kPrimaryColor),
                                           ),
                                           onPressed: () {
+                                            Firestore.instance.collection("Shops Details").document("ShopID").setData(
+                                                {
+                                                  key: controller.text,
+                                                },merge: true
+                                            );
                                             if (controller.text != '') {
                                               Navigator.pop(context, true);
                                             }
