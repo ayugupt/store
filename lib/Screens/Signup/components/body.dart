@@ -13,6 +13,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_auth/listview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_auth/pages/homepage.dart';
 
 class Body extends StatefulWidget {
   @override
@@ -28,9 +29,10 @@ class _BodyState extends State<Body> {
 
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
-  getCurrentUser() async{
+  getCurrentUser() async {
     user = await _auth.currentUser();
   }
+
   Future<FirebaseUser> _signIn() async {
     try {
       GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
@@ -63,8 +65,11 @@ class _BodyState extends State<Body> {
     }
   }
 
-  Future<int> getUser() async{
-    var isThere = await Firestore.instance.collection('users').where('email', isEqualTo: user.email).getDocuments();
+  Future<int> getUser() async {
+    var isThere = await Firestore.instance
+        .collection('users')
+        .where('email', isEqualTo: user.email)
+        .getDocuments();
     var num = isThere.documents.length;
     return num;
   }
@@ -74,6 +79,7 @@ class _BodyState extends State<Body> {
     super.initState();
     getCurrentUser();
   }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -124,10 +130,10 @@ class _BodyState extends State<Body> {
                 SocalIcon(
                   iconSrc: "assets/icons/google-plus.svg",
                   press: () {
-                    try{
-                      _signIn().whenComplete(() async{
+                    try {
+                      _signIn().whenComplete(() async {
                         var num = await getUser();
-                        if(num == 0) {
+                        if (num == 0) {
                           Firestore.instance.collection('users').add({
                             'name': name,
                             'email': user.email,
@@ -137,15 +143,14 @@ class _BodyState extends State<Body> {
                           });
                           Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
-                            return (Profile());
+                            return (HomePage());
                           }));
-                        }
-                        else{
+                        } else {
                           googleSignIn.signOut();
                           print('Account Already Exists');
                         }
                       });
-                    }catch(e){
+                    } catch (e) {
                       print(e);
                     }
                   },

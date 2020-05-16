@@ -116,7 +116,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                     itemCount: categories.length,
                                     gridDelegate:
                                         SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 3, childAspectRatio: 3
+                                            crossAxisCount: 2, childAspectRatio: 3
                                             ),
                                     itemBuilder: (context, index) {
                                       return Container(child:checkBoxWithTitle(
