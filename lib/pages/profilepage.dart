@@ -209,10 +209,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   }
 
   Widget gridItems() {
-    double fontSize = MediaQuery.of(context).size.width * 0.035;
+    double fontSize = MediaQuery.of(context).size.width * 0.04;
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, childAspectRatio: 1),
+          crossAxisCount: 2, childAspectRatio: 1),
       itemCount: searchController.text == ''
           ? itemData.length + 1
           : searchResults.length,
@@ -228,8 +228,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 size: MediaQuery.of(context).size.width * 0.25,
                 color: Colors.grey,
               ))),
-              width: MediaQuery.of(context).size.width * 0.33,
-              height: MediaQuery.of(context).size.width * 0.33,
+              width: MediaQuery.of(context).size.width * 0.5,
+              height: MediaQuery.of(context).size.width * 0.5,
             )),
             onTap: () {
               showDialog(
@@ -464,7 +464,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           child: Card(
             child: Stack(children: <Widget>[
               Container(
-                height: MediaQuery.of(context).size.width * 0.19,
+                height: MediaQuery.of(context).size.width * 0.30,
                 decoration: BoxDecoration(
                     gradient: LinearGradient(
                         colors: [kPrimaryLightColor, kPrimaryColor],
@@ -474,42 +474,47 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               Center(
                   child: Column(children: <Widget>[
                 SizedBox(
-                  height: MediaQuery.of(context).size.width * 0.008,
+                  height: MediaQuery.of(context).size.width * 0.06,
                 ),
                 Text(
                   searchController.text == ''
                       ? itemData[index]["Item Name"]
                       : searchResults[index]["Item Name"],
                   style: TextStyle(fontSize: fontSize),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.width * 0.008,
+                  height: MediaQuery.of(context).size.width * 0.01,
                 ),
                 Text(
                   searchController.text == ''
                       ? "Rs.${itemData[index]["Item Price"]}"
                       : "Rs.${searchResults[index]["Item Price"]}",
                   style: TextStyle(fontSize: fontSize),
+                  textAlign: TextAlign.center,
                 ),
                 Text(
                   searchController.text == ''
                       ? itemData[index]["Item Expiry"]
                       : searchResults[index]["Item Expiry"],
                   style: TextStyle(fontSize: fontSize),
+                  textAlign: TextAlign.center,
                 ),
                 Text(
                   searchController.text == ''
                       ? itemData[index]["Item Category"]
                       : searchResults[index]["Item Category"],
                   style: TextStyle(fontSize: fontSize),
+                  textAlign: TextAlign.center,
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.width * 0.01,
+                  height: MediaQuery.of(context).size.width * 0.08,
                 ),
                 Text(
                   "Quantity",
                   style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: fontSize),
+                      fontWeight: FontWeight.bold, fontSize: fontSize*1.1),
                 ),
                 Row(
                   children: <Widget>[
@@ -533,6 +538,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                   ? itemData[index].documentID
                                   : searchResults[index].documentID,
                               quantityString);
+
                           searchController.notifyListeners();
                         },
                         backgroundColor: Colors.grey[100],
@@ -650,8 +656,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               ),
             ]),
           ),
-          width: MediaQuery.of(context).size.width * 0.33,
-          height: MediaQuery.of(context).size.width * 0.33,
+          width: MediaQuery.of(context).size.width * 0.5,
+          height: MediaQuery.of(context).size.width * 0.5,
         ));
       },
     );
