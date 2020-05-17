@@ -14,6 +14,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_auth/listview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class Body extends StatefulWidget {
   @override
@@ -132,7 +133,7 @@ class _BodyState extends State<Body> {
                           Firestore.instance.collection('users').add({
                             'name': name,
                             'email': user.email,
-                            'shopName': null,
+                            'pincode': null,
                             "address": null,
                             'phone_no': null,
                           });
@@ -143,6 +144,29 @@ class _BodyState extends State<Body> {
                         }
                         else{
                           googleSignIn.signOut();
+                          Alert(
+                            context: context,
+                            title: 'Error',
+                            desc: 'Account already exists, please LogIn.',
+                            buttons: [
+                              DialogButton(
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20.0,
+                                  ),
+                                ),
+                                onPressed: () => Navigator.pop(context),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.purple[800],
+                                    Colors.purple
+                                  ]
+                                ),
+                              ),
+                            ]
+                          ).show();
                           print('Account Already Exists');
                         }
                       });

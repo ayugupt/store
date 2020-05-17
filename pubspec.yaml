@@ -30,6 +30,7 @@ dependencies:
   firebase_auth: ^0.16.0
   google_sign_in: ^4.4.4
   rxdart: ^0.24.0
+  rflutter_alert: ^1.0.3
   hexcolor:
 
 dev_dependencies:
