@@ -5,6 +5,7 @@ import 'package:flutter_auth/pages/profilepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_auth/pages/orderDetails.dart';
 
 class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
@@ -25,19 +26,31 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<AnimationController> controllers = new List<AnimationController>();
   List<Animation> animations = new List<Animation>();
 
-  Future getUser () async {
+  Map<String, bool> filterVars = new Map<String, bool>();
+
+  List<String> categories = ["Cash", "Netbanking", "UPI", "Cheque"];
+
+  bool gotLength = false;
+
+  Future getUser() async {
     user = await _auth.currentUser();
-    print(user.email);
+    //print(user.email);
   }
-  Future setContent() async{
+
+  Future setContent() async {
     users = await _fireStore.collection('Buy').getDocuments();
     setState(() {
       var len = users.documents.length;
+      gotLength = true;
       orders = len;
     });
   }
-  initialWork () {
-    tween = new Tween<double>(begin: 0, end: 0.1);
+
+  initialWork() {
+    categories.forEach((category) {
+      filterVars[category] = false;
+    });
+    tween = new Tween<double>(begin: 0, end: 0.15);
 
     for (int i = 0; i < orders; i++) {
       showMore.add(false);
@@ -57,16 +70,16 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
       });
     }
   }
+
   @override
   void initState() {
-    
-    getUser().then((value) => setContent().then((value) => initialWork()));
+    getUser().then((value) => setContent().then((_) => initialWork()));
     super.initState();
   }
 
   @override
-  void dispose(){
-    for(int i = 0; i < controllers.length; i++){
+  void dispose() {
+    for (int i = 0; i < controllers.length; i++) {
       controllers[i].dispose();
     }
     super.dispose();
@@ -75,94 +88,222 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder(
-        stream: _fireStore.collection('Buy').snapshots(),
-        builder: (context, buySnapshots) {
-          return StreamBuilder(
-            stream: _fireStore.collection('Items').snapshots(),
-            builder: (context, itemSnapshots) {
-              return StreamBuilder(
-                stream: _fireStore.collection('users').snapshots(),
-                builder: (context, userSnapshots) {
-                  if(!userSnapshots.hasData || !itemSnapshots.hasData || !buySnapshots.hasData){
-                    return Center(
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.lightBlueAccent,
-                      ),
-                    );
-                  }
-                  List<Map> containers = [];
-                  for(var userSnap in userSnapshots.data.documents) {
-                    for (var buy in buySnapshots.data.documents) {
-                      if (buy.data['userId'].toString().trim() == userSnap.data['email'].toString().trim()) {
-                        for(var item in itemSnapshots.data.documents){
-                          if(buy.data['Item name'].toString().trim() == item.data['name'].toString().trim()){
-                            Map<String, String> container = {
-                              'name': userSnap.data['name'],
-                              'address': userSnap.data['address'],
-                              'email': userSnap.data['email'],
-                              'number': userSnap.data['phone_no'],
-                              'pinCode': userSnap.data['pincode'],
-                              'itemName': item.data['name'],
-                              'quantity': buy.data['quantity'],
-                              'totalPrice': (int.parse(buy.data['quantity'].toString()) * int.parse(item.data['price'].toString())).toString(),
-                            };
-                            containers.add(container);
+      body: gotLength
+          ? StreamBuilder(
+              stream: _fireStore.collection('Buy').snapshots(),
+              builder: (context, buySnapshots) {
+                //print(buySnapshots.data.documents.length);
+                return StreamBuilder(
+                  stream: _fireStore.collection('Items').snapshots(),
+                  builder: (context, itemSnapshots) {
+                    return StreamBuilder(
+                      stream: _fireStore.collection('users').snapshots(),
+                      builder: (context, userSnapshots) {
+                        if (!userSnapshots.hasData ||
+                            !itemSnapshots.hasData ||
+                            !buySnapshots.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              backgroundColor: Colors.lightBlueAccent,
+                            ),
+                          );
+                        }
+                        List<Map> containers = [];
+                        for (var userSnap in userSnapshots.data.documents) {
+                          for (var buy in buySnapshots.data.documents) {
+                            if (buy.data['userId'].toString().trim() ==
+                                userSnap.data['email'].toString().trim()) {
+                              for (var item in itemSnapshots.data.documents) {
+                                if (buy.data['Item name'].toString().trim() ==
+                                    item.data['name'].toString().trim()) {
+                                  Map<String, String> container = {
+                                    'name': userSnap.data['name'],
+                                    'address': userSnap.data['address'],
+                                    'email': userSnap.data['email'],
+                                    'number': userSnap.data['phone_no'],
+                                    'pinCode': userSnap.data['pincode'],
+                                    'itemName': item.data['name'],
+                                    'quantity': buy.data['quantity'],
+                                    'totalPrice': (int.parse(buy
+                                                .data['quantity']
+                                                .toString()) *
+                                            int.parse(
+                                                item.data['price'].toString()))
+                                        .toString(),
+                                  };
+                                  containers.add(container);
+                                }
+                              }
+                            }
                           }
                         }
-                      }
-                    }
-                  }
-                  containers = containers.toSet().toList();
-                  containers.remove(null);
-                  allUsers = groupBy(containers, (obj) => obj['pinCode']).values.toList();
-                  print(allUsers);
-                  return CustomScrollView(
-                    slivers: <Widget>[
-                      SliverAppBar(
-                        title: Text("Orders"),
-                        actions: <Widget>[
-                          IconButton(
-                            icon: Icon(
-                              Icons.tune,
-                            ),
-                            onPressed: () {},
-                          )
-                        ],
-                        floating: true,
-                      ),
-                      SliverList(
-                        delegate: SliverChildBuilderDelegate((context, index) {
-                          if(orders == 0) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  child: Text(
-                                    'No Orders Yet',
-                                    style: TextStyle(
-                                      fontSize: 20.0,
-                                      color: Colors.grey,
-                                    ),
+                        containers = containers.toSet().toList();
+                        containers.remove(null);
+                        allUsers = groupBy(containers, (obj) => obj['pinCode'])
+                            .values
+                            .toList();
+                        print(containers);
+
+                        if (buySnapshots.data.documents.length > orders) {
+                          for (int i = orders;
+                              i < buySnapshots.data.documents.length;
+                              i++) {
+                            showMore.add(false);
+                            controllers.add(AnimationController(
+                                vsync: this,
+                                duration: Duration(milliseconds: 200)));
+                            animations.add(tween.animate(controllers[i]));
+                            animations[i].addListener(() {
+                              setState(() {});
+                            });
+                          }
+                          orders = buySnapshots.data.documents.length;
+                        }
+
+                        return CustomScrollView(
+                          slivers: <Widget>[
+                            SliverAppBar(
+                              title: Text("Orders"),
+                              actions: <Widget>[
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.tune,
                                   ),
-                                ),
+                                  onPressed: () {
+                                    double headingSize =
+                                        MediaQuery.of(context).size.width *
+                                            0.05;
+                                    double leftPadding =
+                                        MediaQuery.of(context).size.width *
+                                            0.02;
+                                    showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return StatefulBuilder(
+                                              builder: (context, setState) {
+                                            return Wrap(children: <Widget>[
+                                              Dialog(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20)),
+                                                insetPadding: EdgeInsets.only(
+                                                    top: MediaQuery.of(context)
+                                                            .size
+                                                            .height *
+                                                        0.1,
+                                                    left: MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.05,
+                                                    right:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.05),
+                                                child: Column(
+                                                  children: <Widget>[
+                                                    SizedBox(
+                                                        height: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .height *
+                                                            0.02),
+                                                    Text(
+                                                      "Filter Options",
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize:
+                                                              headingSize),
+                                                    ),
+                                                    Padding(
+                                                      child: Align(
+                                                        child: Text(
+                                                          "Mode of payment:",
+                                                          style: TextStyle(
+                                                              fontSize:
+                                                                  headingSize),
+                                                        ),
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                      ),
+                                                      padding: EdgeInsets.only(
+                                                          left: leftPadding,
+                                                          top: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .height *
+                                                              0.03),
+                                                    ),
+                                                    GridView.builder(
+                                                      physics:
+                                                          NeverScrollableScrollPhysics(),
+                                                      itemCount:
+                                                          categories.length,
+                                                      gridDelegate:
+                                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                                              crossAxisCount: 2,
+                                                              childAspectRatio:
+                                                                  3),
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        return Container(
+                                                            child:
+                                                                checkBoxWithTitle(
+                                                                    categories[
+                                                                        index],
+                                                                    setState));
+                                                      },
+                                                      shrinkWrap: true,
+                                                    )
+                                                  ],
+                                                ),
+                                              )
+                                            ]);
+                                          });
+                                        });
+                                  },
+                                )
                               ],
-                            );
-                          }
-                          else {
-                            return orderCard(index);
-                          }
-                        }, childCount: orders),
-                      )
-                    ],
-                  );
-                },
-              );
-            },
-          );
-        },
-      ),
+                              floating: true,
+                            ),
+                            SliverList(
+                              delegate:
+                                  SliverChildBuilderDelegate((context, index) {
+                                if (orders == 0) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Container(
+                                        child: Text(
+                                          'No Orders Yet',
+                                          style: TextStyle(
+                                            fontSize: 20.0,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                } else {
+                                  return orderCard(index, containers[index]);
+                                }
+                              }, childCount: orders),
+                            )
+                          ],
+                        );
+                      },
+                    );
+                  },
+                );
+              },
+            )
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
       backgroundColor: Colors.grey[200],
       drawer: Drawer(
         child: Column(
@@ -177,8 +318,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (BuildContext context) {
-                        return Profile();
-                      }));
+                    return Profile();
+                  }));
                 })
           ],
         ),
@@ -186,7 +327,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget orderCard(int index) {
+  Widget orderCard(int index, Map<String, String> details) {
     return Column(children: <Widget>[
       InkWell(
         child: Align(
@@ -197,7 +338,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   children: <Widget>[
                     Padding(
                       child: Align(
-                        child: Text("Customer Name"),
+                        child: Text(details["name"]),
                         alignment: Alignment.centerLeft,
                       ),
                       padding: EdgeInsets.only(
@@ -207,10 +348,12 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     Padding(
                       child: Align(
                         child: Text(
-                          "Address",
+                          details["address"] != null
+                              ? details["address"]
+                              : "Address",
                           style: TextStyle(
                               fontSize:
-                              MediaQuery.of(context).size.width * 0.05),
+                                  MediaQuery.of(context).size.width * 0.05),
                         ),
                         alignment: Alignment.centerLeft,
                       ),
@@ -225,7 +368,17 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           ),
                           alignment: Alignment.centerLeft),
                       padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.03,
+                          top: MediaQuery.of(context).size.height * 0.02,
+                          left: MediaQuery.of(context).size.width * 0.02),
+                    ),
+                    Padding(
+                      child: Align(
+                          child: Text(
+                            "Payment Method",
+                          ),
+                          alignment: Alignment.centerLeft),
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.01,
                           left: MediaQuery.of(context).size.width * 0.02),
                     ),
                   ],
@@ -254,48 +407,73 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             height: MediaQuery.of(context).size.height * 0.2,
           ),
         ),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return OrderDetails(details);
+          }));
+        },
       ),
       showMore[index] || animations[index].value != 0
           ? Align(
-        child: Container(
-          color: Colors.grey[100],
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height *
-              animations[index].value,
-          child: showMore[index] && controllers[index].isCompleted
-              ? Column(children: <Widget>[
-            Padding(
-              child: Align(
-                child: Text("Total Items"),
-                alignment: Alignment.centerLeft,
+              child: Container(
+                color: Colors.grey[100],
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height *
+                    animations[index].value,
+                child: showMore[index] && controllers[index].isCompleted
+                    ? Column(children: <Widget>[
+                        ListTile(
+                          title: Text("Total Items"),
+                          trailing: Text(details["quantity"]),
+                          dense: true,
+                        ) /*Align(
+                            child: Text("Total Items"),
+                            alignment: Alignment.centerLeft,
+                          )*/
+                        ,
+                        ListTile(
+                          title: Text("Total Price"),
+                          trailing: Text(details["totalPrice"]),
+                          dense: true,
+                        ),
+                      ])
+                    : SizedBox(
+                        height: 0,
+                        width: 0,
+                      ),
               ),
-              padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.01,
-                  left: MediaQuery.of(context).size.width * 0.02),
-            ),
-            Padding(
-              child: Align(
-                child: Text("Total Price"),
-                alignment: Alignment.centerLeft,
-              ),
-              padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.01,
-                  left: MediaQuery.of(context).size.width * 0.02),
             )
-          ])
-              : SizedBox(
-            height: 0,
-            width: 0,
-          ),
-        ),
-      )
           : SizedBox(
-        height: 0,
-        width: 0,
-      ),
+              height: 0,
+              width: 0,
+            ),
       SizedBox(
         height: MediaQuery.of(context).size.height * 0.01,
       )
     ]);
+  }
+
+  Widget checkBoxWithTitle(String title, StateSetter setState) {
+    return Row(
+      children: <Widget>[
+        Text(title),
+        Checkbox(
+          value: filterVars[title],
+          onChanged: (change) {
+            setState(() {
+              if (change) {
+                categories.forEach((category) {
+                  if (title != category && filterVars[category] == true) {
+                    filterVars[category] = false;
+                  }
+                });
+              }
+              filterVars[title] = change;
+            });
+          },
+        ),
+      ],
+      mainAxisAlignment: MainAxisAlignment.center,
+    );
   }
 }

@@ -9,10 +9,8 @@ import 'package:flutter_auth/components/rounded_button.dart';
 import 'package:flutter_auth/components/rounded_input_field.dart';
 import 'package:flutter_auth/components/rounded_password_field.dart';
 import 'package:flutter_auth/pages/homepage.dart';
-import 'package:flutter_auth/pages/profilepage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_auth/listview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
@@ -33,6 +31,7 @@ class _BodyState extends State<Body> {
   getCurrentUser() async{
     user = await _auth.currentUser();
   }
+  // ignore: missing_return
   Future<FirebaseUser> _signIn() async {
     try {
       GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
