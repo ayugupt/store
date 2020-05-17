@@ -31,6 +31,9 @@ dependencies:
   google_sign_in: ^4.4.4
   rxdart: ^0.24.0
   rflutter_alert: ^1.0.3
+  pdf: ^1.8.0
+  path_provider: ^1.6.8
+  flutter_full_pdf_viewer: ^1.0.6
   hexcolor:
 
 dev_dependencies:

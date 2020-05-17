@@ -1,4 +1,10 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/pages/pdfViewer.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pdfLib;
+import 'package:path_provider/path_provider.dart';
 
 class OrderDetails extends StatefulWidget {
   Map<String, String> details;
@@ -10,6 +16,114 @@ class OrderDetails extends StatefulWidget {
 class OrderDetailsState extends State<OrderDetails> {
   Color headingColor = Colors.grey;
 
+  _generatePdfAndView(context) async {
+    final pdfLib.Document pdf = pdfLib.Document(deflate: zlib.encode);
+
+    pdf.addPage(pdfLib.MultiPage(
+      build: (context) => [
+        pdfLib.Column(
+          mainAxisAlignment: pdfLib.MainAxisAlignment.spaceBetween,
+          children: [
+            pdfLib.Padding(
+              padding: pdfLib.EdgeInsets.only(top: 10.0, bottom: 30.0),
+              child: pdfLib.Text(
+                  'Items',
+                  style: pdfLib.TextStyle(
+                    fontSize: 50.0,
+                    color: PdfColors.grey,
+                  )
+              ),
+            ),
+            pdfLib.Padding(
+                padding: pdfLib.EdgeInsets.only(top: 10.0, bottom: 30.0),
+              child: pdfLib.Container(
+                  child: pdfLib.Column(
+                      children: [
+                        pdfLib.Row(
+                            mainAxisAlignment: pdfLib.MainAxisAlignment.spaceBetween,
+                            children: [
+                              pdfLib.Text(
+                                  widget.details["itemName"] +
+                                      " x " +
+                                      widget.details["quantity"],
+                                  style: pdfLib.TextStyle(
+                                    fontSize: 25.0,
+                                  )
+                              ),
+                              pdfLib.Text(
+                                  widget.details['totalPrice'],
+                                  style: pdfLib.TextStyle(
+                                    fontSize: 25.0,
+                                  )
+                              ),
+                            ]
+                        )
+                      ]
+                  )
+              ),
+            ),
+            pdfLib.Padding(
+                padding: pdfLib.EdgeInsets.only(top: 10.0, bottom: 30.0),
+              child: pdfLib.Text(
+                  'Address',
+                  style: pdfLib.TextStyle(
+                    fontSize: 50.0,
+                    color: PdfColors.grey,
+                  )
+              )
+            ),
+            pdfLib.Padding(
+                padding: pdfLib.EdgeInsets.only(top: 10.0, bottom: 30.0),
+              child: pdfLib.Container(
+                child: pdfLib.Column(
+                  crossAxisAlignment: pdfLib.CrossAxisAlignment.start,
+                  children: [
+                    pdfLib.Text(
+                        widget.details["name"],
+                        style: pdfLib.TextStyle(
+                          fontSize: 25.0,
+                        )
+                    ),
+                    pdfLib.Text(
+                        widget.details["address"] != null
+                            ? widget.details["address"] +
+                            "\n" +
+                            widget.details["pinCode"]
+                            : "Address\n" + widget.details["pinCode"],
+                        style: pdfLib.TextStyle(
+                          fontSize: 25.0,
+                        )
+                    ),
+                    pdfLib.Text(
+                        widget.details["number"] != null
+                            ? widget.details["number"]
+                            : "Phone Number",
+                        style: pdfLib.TextStyle(
+                          fontSize: 25.0,
+                        )
+                    ),
+                    pdfLib.Text(
+                        widget.details["email"],
+                        style: pdfLib.TextStyle(
+                          fontSize: 25.0,
+                        )
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ]
+        )]
+    ));
+
+    final String dir = (await getTemporaryDirectory()).path;
+    final String path = '$dir/sample.pdf';
+    final File file = File(path);
+    await file.writeAsBytes(pdf.save());
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => PdfViewerPage(path: path),
+    ));
+  }
   @override
   Widget build(BuildContext context) {
     double leftPadding = MediaQuery.of(context).size.width * 0.03;
@@ -131,7 +245,9 @@ class OrderDetailsState extends State<OrderDetails> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.print),
-            onPressed: () {},
+            onPressed: () {
+              _generatePdfAndView(context);
+            },
           )
         ],
       ),
