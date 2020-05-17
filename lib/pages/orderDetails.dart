@@ -5,6 +5,8 @@ import 'package:flutter_auth/pages/pdfViewer.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdfLib;
 import 'package:path_provider/path_provider.dart';
+import 'package:printing/printing.dart';
+
 
 class OrderDetails extends StatefulWidget {
   Map<String, String> details;
@@ -116,13 +118,15 @@ class OrderDetailsState extends State<OrderDetails> {
         )]
     ));
 
-    final String dir = (await getTemporaryDirectory()).path;
+    final String dir = (await getApplicationDocumentsDirectory()).path;
     final String path = '$dir/sample.pdf';
     final File file = File(path);
     await file.writeAsBytes(pdf.save());
-    Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => PdfViewerPage(path: path),
-    ));
+    await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async => pdf.save());
+    //Navigator.of(context).push(MaterialPageRoute(
+      //builder: (_) => PdfViewerPage(path: path),
+    //));
   }
   @override
   Widget build(BuildContext context) {
