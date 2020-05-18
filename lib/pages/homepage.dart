@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/pages/profilepage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_auth/pages/orderDetails.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
@@ -31,6 +33,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<String> categories = ["Cash", "Netbanking", "UPI", "Cheque"];
 
   bool gotLength = false;
+
+  Future<String> checkLoggedIn () async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var email = prefs.getString('email');
+    print(email);
+    return email;
+  }
 
   Future getUser() async {
     user = await _auth.currentUser();
@@ -73,6 +82,9 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   void initState() {
+    if(checkLoggedIn() == null){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+    }
     getUser().then((value) => setContent().then((_) => initialWork()));
     super.initState();
   }
@@ -320,6 +332,17 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       MaterialPageRoute(builder: (BuildContext context) {
                     return Profile();
                   }));
+                }),
+            ListTile(
+                leading: Icon(Icons.arrow_back_ios),
+                title: Text("Logout"),
+                onTap: () async{
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  prefs.remove('email');
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (BuildContext context) {
+                        return LoginScreen();
+                      }));
                 })
           ],
         ),

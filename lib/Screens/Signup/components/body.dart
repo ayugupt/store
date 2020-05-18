@@ -9,12 +9,11 @@ import 'package:flutter_auth/components/rounded_button.dart';
 import 'package:flutter_auth/components/rounded_input_field.dart';
 import 'package:flutter_auth/components/rounded_password_field.dart';
 import 'package:flutter_auth/pages/homepage.dart';
-import 'package:flutter_auth/pages/profilepage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_auth/listview.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_auth/pages/homepage.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatefulWidget {
   @override
@@ -30,10 +29,11 @@ class _BodyState extends State<Body> {
 
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
-  getCurrentUser() async {
+  getCurrentUser() async{
     user = await _auth.currentUser();
   }
 
+  // ignore: missing_return
   Future<FirebaseUser> _signIn() async {
     try {
       GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
@@ -66,11 +66,8 @@ class _BodyState extends State<Body> {
     }
   }
 
-  Future<int> getUser() async {
-    var isThere = await Firestore.instance
-        .collection('users')
-        .where('email', isEqualTo: user.email)
-        .getDocuments();
+  Future<int> getUser() async{
+    var isThere = await Firestore.instance.collection('users').where('email', isEqualTo: user.email).getDocuments();
     var num = isThere.documents.length;
     return num;
   }
@@ -80,7 +77,6 @@ class _BodyState extends State<Body> {
     super.initState();
     getCurrentUser();
   }
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -131,14 +127,16 @@ class _BodyState extends State<Body> {
                 SocalIcon(
                   iconSrc: "assets/icons/google-plus.svg",
                   press: () {
-                    try {
-                      _signIn().whenComplete(() async {
+                    try{
+                      _signIn().whenComplete(() async{
                         var num = await getUser();
-                        if (num == 0) {
+                        if(num == 0) {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          prefs.setString('email', user.email);
                           Firestore.instance.collection('users').add({
                             'name': name,
                             'email': user.email,
-                            'shopName': null,
+                            'pincode': null,
                             "address": null,
                             'phone_no': null,
                           });
@@ -146,12 +144,38 @@ class _BodyState extends State<Body> {
                               .push(MaterialPageRoute(builder: (context) {
                             return (HomePage());
                           }));
-                        } else {
+                        }
+                        else{
                           googleSignIn.signOut();
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          prefs.remove('email');
+                          Alert(
+                            context: context,
+                            title: 'Error',
+                            desc: 'Account already exists, please LogIn.',
+                            buttons: [
+                              DialogButton(
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20.0,
+                                  ),
+                                ),
+                                onPressed: () => Navigator.pop(context),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.purple[800],
+                                    Colors.purple
+                                  ]
+                                ),
+                              ),
+                            ]
+                          ).show();
                           print('Account Already Exists');
                         }
                       });
-                    } catch (e) {
+                    }catch(e){
                       print(e);
                     }
                   },
