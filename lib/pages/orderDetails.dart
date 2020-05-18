@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_auth/Screens/Login/login_screen.dart';
 import 'package:flutter_auth/pages/pdfViewer.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdfLib;
 import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class OrderDetails extends StatefulWidget {
@@ -17,6 +19,13 @@ class OrderDetails extends StatefulWidget {
 
 class OrderDetailsState extends State<OrderDetails> {
   Color headingColor = Colors.grey;
+
+  Future<String> checkLoggedIn () async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var email = prefs.getString('email');
+    print(email);
+    return email;
+  }
 
   _generatePdfAndView(context) async {
     final pdfLib.Document pdf = pdfLib.Document(deflate: zlib.encode);
@@ -128,6 +137,17 @@ class OrderDetailsState extends State<OrderDetails> {
       //builder: (_) => PdfViewerPage(path: path),
     //));
   }
+
+  @override
+  void initState() {
+    super.initState();
+    if(checkLoggedIn() == null){
+      Navigator.push(context, MaterialPageRoute(
+        builder: (context) => LoginScreen(),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double leftPadding = MediaQuery.of(context).size.width * 0.03;

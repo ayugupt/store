@@ -12,6 +12,7 @@ import 'package:flutter_auth/pages/profilepage.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatelessWidget {
   const Body({
@@ -104,6 +105,8 @@ class Body extends StatelessWidget {
                       _signIn().whenComplete(() async{
                         var user = await FirebaseAuth.instance.currentUser();
                         if( user.email != null ) {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          prefs.setString('email', user.email);
                           Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
                             return (HomePage());

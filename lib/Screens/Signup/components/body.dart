@@ -13,6 +13,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Body extends StatefulWidget {
   @override
@@ -31,6 +32,7 @@ class _BodyState extends State<Body> {
   getCurrentUser() async{
     user = await _auth.currentUser();
   }
+
   // ignore: missing_return
   Future<FirebaseUser> _signIn() async {
     try {
@@ -129,6 +131,8 @@ class _BodyState extends State<Body> {
                       _signIn().whenComplete(() async{
                         var num = await getUser();
                         if(num == 0) {
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          prefs.setString('email', user.email);
                           Firestore.instance.collection('users').add({
                             'name': name,
                             'email': user.email,
@@ -143,6 +147,8 @@ class _BodyState extends State<Body> {
                         }
                         else{
                           googleSignIn.signOut();
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          prefs.remove('email');
                           Alert(
                             context: context,
                             title: 'Error',
