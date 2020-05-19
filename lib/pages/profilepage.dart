@@ -52,7 +52,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         profileData["Address"] = ShopData["Address"];
       });
     });
-    Firestore.instance.collection(loggedInUser.displayName).snapshots().listen((data) {
+    Username=loggedInUser.displayName;
+    String UniqueiD=loggedInUser.uid;
+    Firestore.instance.collection("Shopitems/$Username/$UniqueiD").snapshots().listen((data) {
       setState(() {
         itemData = data.documents;
         gotData = true;
@@ -110,7 +112,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
       start();
     });
     Username=getCurrentUser().toString();
-    print("MILA KYA $Username");
     tabController = new TabController(length: 2, initialIndex: 0, vsync: this);
 
 
