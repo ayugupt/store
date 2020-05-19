@@ -17,22 +17,45 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   FirebaseUser loggedInUser;
 
   Future<void> getCurrentUser() async {
+    FirebaseUser user;
     try {
-      final user = await _auth.currentUser();
+      user = await _auth.currentUser();
       print(
           "user is ${user == null ? "null" : "User name-" + user.displayName}");
 
       if (user != null) {
-        loggedInUser = user;
+        setState(() {
+          loggedInUser = user;
+        });
       }
     } catch (e) {
       print('hi ' + e);
     }
+    Firestore.instance
+        .collection("Shops Details")
+        .document(loggedInUser.displayName)
+        .snapshots()
+        .listen((shopdata) {
+      setState(() {
+        var ShopData = shopdata.data;
+        profileData["Shop Name"] = ShopData["Shop Name"];
+        profileData["Name"] = ShopData["Name"];
+        profileData["Number"] = ShopData["Number"];
+        profileData["Address"] = ShopData["Address"];
+      });
+    });
+    Firestore.instance.collection(loggedInUser.displayName).snapshots().listen((data) {
+      setState(() {
+        itemData = data.documents;
+        gotData = true;
+      });
+    });
+
   }
 
-  List start() {
-    Username = loggedInUser.displayName;
-    Useremail = loggedInUser.email;
+  Future<List> start() async{
+    final Username = await loggedInUser.displayName;
+    Useremail = await loggedInUser.email;
     setState(() {});
     return [Username, Useremail];
   }
@@ -64,33 +87,18 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   List<DocumentSnapshot> searchResults;
 
+  Getprofiledata() async{
+  }
+
   @override
   void initState() {
     getCurrentUser().then((_) {
       start();
     });
-    Firestore.instance
-        .collection("Shops Details")
-        .document("ShopID")
-        .snapshots()
-        .listen((shopdata) {
-      setState(() {
-        var ShopData = shopdata.data;
-        profileData["Shop Name"] = ShopData["Shop Name"];
-        profileData["Name"] = ShopData["Name"];
-        profileData["Number"] = ShopData["Number"];
-        profileData["Address"] = ShopData["Address"];
-      });
-    });
-
+    Username=getCurrentUser().toString();
+    print("MILA KYA $Username");
     tabController = new TabController(length: 2, initialIndex: 0, vsync: this);
 
-    Firestore.instance.collection("Shop Id").snapshots().listen((data) {
-      setState(() {
-        itemData = data.documents;
-        gotData = true;
-      });
-    });
 
     searchController.addListener(() {
       searchResults = new List<DocumentSnapshot>();
@@ -762,7 +770,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                           onPressed: () {
                                             Firestore.instance
                                                 .collection("Shops Details")
-                                                .document("ShopID")
+                                                .document(Username)
                                                 .setData({
                                               key: controller.text,
                                             }, merge: true);
