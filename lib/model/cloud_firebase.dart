@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class Firestore_service {
   static final Firestore db = Firestore.instance;
@@ -8,7 +10,20 @@ class Firestore_service {
       String ItemCategory, String ItemPrice, String ItemExpiry) async {
     //QuerySnapshot querySnapshot = await db.collection("Shop 1").getDocuments();
     //int itemnumber=querySnapshot.documents.length+1;
-    db.collection('Shop Id').document().setData({
+    FirebaseUser loggedInUser;
+      FirebaseUser user;
+      try {
+        user = await _auth.currentUser();
+        print(
+            "user is ${user == null ? "null" : "User name-" + user.displayName}");
+
+        if (user != null) {
+            loggedInUser = user;
+        }
+      } catch (e) {
+        print('hi ' + e);
+      }
+    db.collection(loggedInUser.displayName).document().setData({
       'Item Name': ItemName,
       'Item Quantity': ItemQuantity,
       "Item Category": ItemCategory,

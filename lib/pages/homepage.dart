@@ -25,6 +25,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   FirebaseUser user;
   QuerySnapshot users;
   var allUsers;
+  bool isPacked;
   List<AnimationController> controllers = new List<AnimationController>();
   List<Animation> animations = new List<Animation>();
 
@@ -149,6 +150,8 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                             int.parse(
                                                 item.data['price'].toString()))
                                         .toString(),
+                                    'isPacked': buy.data['isPacked'].toString(),
+                                    'ID': buy.documentID,
                                   };
                                   containers.add(container);
                                 }
@@ -421,7 +424,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             value: ordersPacked[index],
                             onChanged: (val) {
                               setState(() {
-                                ordersPacked[index] = val;
+                                var ans = details["isPacked"];
+                                _fireStore.collection('Buy').document(details['ID']).updateData({
+                                  'isPacked': 'true',
+                                });
+                                ordersPacked[index] = ans == "true" ? true : false ;
                               });
                             },
                           )
