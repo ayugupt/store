@@ -32,9 +32,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   List<String> categories = ["Cash", "Netbanking", "UPI", "Cheque"];
 
+  List<bool> ordersPacked = new List<bool>();
+
   bool gotLength = false;
 
-  Future<String> checkLoggedIn () async{
+  Future<String> checkLoggedIn() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var email = prefs.getString('email');
     print(email);
@@ -78,12 +80,17 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
         setState(() {});
       });
     }
+
+    for (int j = 0; j < orders; j++) {
+      ordersPacked.add(false);
+    }
   }
 
   @override
   void initState() {
-    if(checkLoggedIn() == null){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+    if (checkLoggedIn() == null) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => LoginScreen()));
     }
     getUser().then((value) => setContent().then((_) => initialWork()));
     super.initState();
@@ -169,6 +176,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               setState(() {});
                             });
                           }
+                          ordersPacked.add(false);
                           orders = buySnapshots.data.documents.length;
                         }
 
@@ -336,13 +344,14 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ListTile(
                 leading: Icon(Icons.arrow_back_ios),
                 title: Text("Logout"),
-                onTap: () async{
-                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                onTap: () async {
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
                   prefs.remove('email');
                   Navigator.push(context,
                       MaterialPageRoute(builder: (BuildContext context) {
-                        return LoginScreen();
-                      }));
+                    return LoginScreen();
+                  }));
                 })
           ],
         ),
@@ -404,6 +413,25 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           top: MediaQuery.of(context).size.height * 0.01,
                           left: MediaQuery.of(context).size.width * 0.02),
                     ),
+                    Padding(
+                      child: Row(
+                        children: <Widget>[
+                          Text("Order Packed"),
+                          Checkbox(
+                            value: ordersPacked[index],
+                            onChanged: (val) {
+                              setState(() {
+                                ordersPacked[index] = val;
+                              });
+                            },
+                          )
+                        ],
+                      ),
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.01,
+                          left: MediaQuery.of(context).size.width * 0.02,
+                          bottom: MediaQuery.of(context).size.height * 0.01),
+                    )
                   ],
                 ),
                 Align(
@@ -427,7 +455,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ]),
             ),
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * 0.2,
+            //height: MediaQuery.of(context).size.height * 0.2,
           ),
         ),
         onTap: () {
