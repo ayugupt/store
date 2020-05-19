@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Firestore_service {
@@ -12,7 +13,7 @@ class Firestore_service {
       'Item Quantity': ItemQuantity,
       "Item Category": ItemCategory,
       "Item Price": ItemPrice,
-      "Item Expiry": ItemExpiry
+      "Item Expiry": ItemExpiry,
     });
   }
 

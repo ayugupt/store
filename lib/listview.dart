@@ -1,9 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+/*import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'model/cloud_firebase.dart';
 import 'constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_auth/constants.dart';
+
+import 'dart:io';
 
 Firestore_service firestore_service = new Firestore_service();
 
@@ -15,7 +17,6 @@ class Listv extends StatefulWidget {
 }
 
 class _ListvState extends State<Listv> {
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String name;
   String email;
@@ -40,6 +41,7 @@ class _ListvState extends State<Listv> {
     setState(() {});
     return [name, email];
   }
+
   TextEditingController itemName = new TextEditingController();
   String selectedOption;
 
@@ -181,22 +183,24 @@ class _ListvState extends State<Listv> {
   Widget _buildList(BuildContext context, DocumentSnapshot document) {
     if (document['Item Name'] != null ||
         document['Item Quantity'] != null ||
-        document['Item Category'] != null||document['Item Price'] != null||document['Item Expiry'] != null) {
+        document['Item Category'] != null ||
+        document['Item Price'] != null ||
+        document['Item Expiry'] != null) {
       return Padding(
         child: Container(
             child: ListTile(
-              title:Column(
+              title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                 Text("Item name-"+document.data["Item Name"]),
-                  Text("Price Rs-"+document.data["Item Price"]),
-                  Text("Expiry Date-"+document.data["Item Expiry"]),
+                  Text("Item name-" + document.data["Item Name"]),
+                  Text("Price Rs-" + document.data["Item Price"]),
+                  Text("Expiry Date-" + document.data["Item Expiry"]),
                 ],
               ),
               trailing: Column(
                 children: <Widget>[
-                  Text("Quantity-  "+document['Item Quantity']),
-                  Text("Category- "+document['Item Category']),
+                  Text("Quantity-  " + document['Item Quantity']),
+                  Text("Category- " + document['Item Category']),
                 ],
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -589,7 +593,12 @@ class _ListvState extends State<Listv> {
                 }).then((pop) {
               if (pop) {
                 firestore_service.Add_Item_Data(
-                    itemName.text, itemQuantity.text, selectedOption,itemPrice.text,itemExpiry.text);
+                    itemName.text,
+                    itemQuantity.text,
+                    selectedOption,
+                    itemPrice.text,
+                    itemExpiry.text,
+                    File(""));
               }
               itemName.text = '';
               itemQuantity.text = '';
@@ -662,3 +671,4 @@ class _ListvState extends State<Listv> {
     );
   }
 }
+*/
