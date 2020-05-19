@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_auth/pages/orderDetails.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
 
 class HomePage extends StatefulWidget {
   HomePageState createState() => HomePageState();
@@ -20,7 +21,7 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final _auth = FirebaseAuth.instance;
   final _fireStore = Firestore.instance;
   Tween<double> tween;
-
+  double latitude, longitude;
   int orders = 0;
   FirebaseUser user;
   QuerySnapshot users;
@@ -37,10 +38,21 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   bool gotLength = false;
 
+  Future getLocation() async {
+    try{
+      Position position =await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+      setState(() {
+        latitude = position.latitude;
+        longitude = position.longitude;
+      });
+    } catch(e) {
+      print(e);
+    }
+  }
+
   Future<String> checkLoggedIn() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var email = prefs.getString('email');
-    print(email);
     return email;
   }
 
@@ -94,6 +106,11 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
           context, MaterialPageRoute(builder: (context) => LoginScreen()));
     }
     getUser().then((value) => setContent().then((_) => initialWork()));
+    getLocation().then((value) {
+      Firestore.instance.collection('Shops Details').document(user.displayName).updateData({
+        'coordinates': "$latitude, $longitude",
+      });
+    });
     super.initState();
   }
 

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/model/cloud_firebase.dart';
@@ -43,13 +42,13 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         .collection("Shops Details")
         .document(loggedInUser.displayName)
         .snapshots()
-        .listen((shopdata) {
+        .listen((shopData) {
       setState(() {
-        var ShopData = shopdata.data;
-        profileData["Shop Name"] = ShopData["Shop Name"];
-        profileData["Name"] = ShopData["Name"];
-        profileData["Number"] = ShopData["Number"];
-        profileData["Address"] = ShopData["Address"];
+        var Shopdata = shopData.data;
+        profileData["Shop Name"] = Shopdata["Shop Name"];
+        profileData["Name"] = Shopdata["Name"];
+        profileData["Number"] = Shopdata["Number"];
+        profileData["Address"] = Shopdata["Address"];
       });
     });
     Username=loggedInUser.displayName;
@@ -60,7 +59,6 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         gotData = true;
       });
     });
-
   }
 
   Future<List> start() async{

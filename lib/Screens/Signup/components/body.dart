@@ -41,7 +41,6 @@ class _BodyState extends State<Body> {
   Future getLocation() async {
     try{
       Position position =await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
-
       setState(() {
         latitude = position.latitude;
         longitude = position.longitude;
@@ -163,8 +162,9 @@ class _BodyState extends State<Body> {
                             'name': name,
                             'email': user.email,
                             'pincode': null,
-                            "address": first.addressLine,
+                            "address": null,
                             'phone_no': null,
+                            "shopName": null,
                           });
                           Navigator.of(context)
                               .push(MaterialPageRoute(builder: (context) {
