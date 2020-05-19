@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_auth/constants.dart';
 import 'package:flutter_auth/model/cloud_firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 
 Firestore_service firestore_service = new Firestore_service();
 
@@ -15,6 +18,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   String Username;
   String Useremail;
   FirebaseUser loggedInUser;
+
+  Future<File> takeItemImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    return image;
+  }
 
   Future<void> getCurrentUser() async {
     FirebaseUser user;
@@ -277,7 +285,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               height: MediaQuery.of(context).size.width * 0.5,
             )),
             onTap: () {
-              print(profileData["Name"]);
+              File itemImage;
               if (profileData["Shop Name"] != null &&
                   profileData["Name"] != null &&
                   profileData["Number"] != null &&
@@ -288,7 +296,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     builder: (BuildContext c) {
                       return StatefulBuilder(builder: (context, setState) {
                         return SimpleDialog(
-                            title: Text("Enter Name and Quantity of item:"),
+                            title: Text("Enter Detials of item:"),
                             children: <Widget>[
                               Row(
                                 children: <Widget>[
@@ -464,6 +472,35 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       : selectedOption),
                                 ),
                               ),
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.02,
+                              ),
+                              Center(
+                                child: GestureDetector(
+                                    child: Container(
+                                      child: itemImage == null
+                                          ? Center(
+                                              child: Icon(
+                                              Icons.add_a_photo,
+                                            ))
+                                          : Image.file(itemImage,
+                                              fit: BoxFit.cover),
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
+                                      height:
+                                          MediaQuery.of(context).size.width *
+                                              0.3,
+                                      color: kPrimaryLightColor,
+                                    ),
+                                    onTap: () {
+                                      takeItemImage().then((img) {
+                                        setState(() {
+                                          itemImage = img;
+                                        });
+                                      });
+                                    }),
+                              ),
                               Row(
                                 children: <Widget>[
                                   Expanded(
@@ -476,7 +513,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       if (itemName.text != '' &&
                                           itemQuantity.text != '' &&
                                           selectedOption != null &&
-                                          selectedOption != "Add") {
+                                          selectedOption != "Add" &&
+                                          itemImage != null) {
                                         Navigator.pop(context, true);
                                       }
                                     },
@@ -500,11 +538,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     }).then((pop) {
                   if (pop) {
                     firestore_service.Add_Item_Data(
-                        itemName.text,
-                        itemQuantity.text,
-                        selectedOption,
-                        itemPrice.text,
-                        itemExpiry.text);
+                      itemName.text,
+                      itemQuantity.text,
+                      selectedOption,
+                      itemPrice.text,
+                      itemExpiry.text,
+                    );
                   }
                   itemName.text = '';
                   itemQuantity.text = '';

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -27,7 +28,7 @@ class Firestore_service {
       'Item Quantity': ItemQuantity,
       "Item Category": ItemCategory,
       "Item Price": ItemPrice,
-      "Item Expiry": ItemExpiry
+      "Item Expiry": ItemExpiry,
     });
   }
 

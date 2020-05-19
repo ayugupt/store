@@ -39,6 +39,7 @@ dependencies:
   geocoder: ^0.2.1
   printing: ^3.4.0
   hexcolor:
+  image_picker: 
 
 dev_dependencies:
   flutter_test:
