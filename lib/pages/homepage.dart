@@ -421,14 +421,13 @@ class HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         children: <Widget>[
                           Text("Order Packed"),
                           Checkbox(
-                            value: ordersPacked[index],
+                            value: details['isPacked'] == 'true' ? true : false,
                             onChanged: (val) {
-                              setState(() {
-                                var ans = details["isPacked"];
-                                _fireStore.collection('Buy').document(details['ID']).updateData({
-                                  'isPacked': 'true',
-                                });
-                                ordersPacked[index] = ans == "true" ? true : false ;
+                              _fireStore
+                                  .collection('Buy')
+                                  .document(details['ID'])
+                                  .updateData({
+                                'isPacked': '$val',
                               });
                             },
                           )
