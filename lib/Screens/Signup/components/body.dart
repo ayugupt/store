@@ -14,6 +14,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoder/geocoder.dart';
 
 class Body extends StatefulWidget {
   @override
@@ -24,7 +26,10 @@ class _BodyState extends State<Body> {
   String name;
   String email;
   String imageUrl;
+  double latitude, longitude;
+  var addresses;
   var user;
+  var first;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -33,6 +38,26 @@ class _BodyState extends State<Body> {
     user = await _auth.currentUser();
   }
 
+  Future getLocation() async {
+    try{
+      Position position =await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
+
+      setState(() {
+        latitude = position.latitude;
+        longitude = position.longitude;
+      });
+    } catch(e) {
+      print(e);
+    }
+  }
+
+  getAddress() async {
+    final coordinates = Coordinates(latitude, longitude);
+    addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    setState(() {
+      first = addresses.first;
+    });
+  }
   // ignore: missing_return
   Future<FirebaseUser> _signIn() async {
     try {
@@ -76,6 +101,7 @@ class _BodyState extends State<Body> {
   void initState() {
     super.initState();
     getCurrentUser();
+    getLocation().then((value) => getAddress());
   }
   @override
   Widget build(BuildContext context) {
@@ -137,7 +163,7 @@ class _BodyState extends State<Body> {
                             'name': name,
                             'email': user.email,
                             'pincode': null,
-                            "address": null,
+                            "address": first.addressLine,
                             'phone_no': null,
                           });
                           Navigator.of(context)
