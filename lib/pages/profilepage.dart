@@ -521,9 +521,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                           selectedOption != null &&
                                           selectedOption != "Add" &&
                                           itemImage != null) {
+                                        Navigator.pop(context, true);
                                         String url= await firestore_service.SaveImage(itemImage,itemName.text);
                                         print(url);
-                                        Navigator.pop(context, true);
                                       }
                                     },
                                   )),
