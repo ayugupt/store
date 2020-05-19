@@ -95,9 +95,15 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   List<DocumentSnapshot> searchResults;
 
-  Getprofiledata() async{
+  Add_ProfileData(String key,String addedtext) async{
+    await getCurrentUser();
+    await Firestore.instance
+        .collection("Shops Details")
+        .document(loggedInUser.displayName)
+        .setData({
+      key : addedtext,
+    }, merge: true);
   }
-
   @override
   void initState() {
     getCurrentUser().then((_) {
@@ -495,7 +501,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                     ),
                                     onTap: () {
                                       takeItemImage().then((img) {
-                                        setState(() {
+                                        setState (() async {
                                           itemImage = img;
                                         });
                                       });
@@ -509,12 +515,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                       "Done",
                                       style: TextStyle(color: kPrimaryColor),
                                     ),
-                                    onPressed: () {
+                                    onPressed: () async {
                                       if (itemName.text != '' &&
                                           itemQuantity.text != '' &&
                                           selectedOption != null &&
                                           selectedOption != "Add" &&
                                           itemImage != null) {
+                                        String url= await firestore_service.SaveImage(itemImage,itemName.text);
+                                        print(url);
                                         Navigator.pop(context, true);
                                       }
                                     },
@@ -806,13 +814,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                             style:
                                                 TextStyle(color: kPrimaryColor),
                                           ),
-                                          onPressed: () {
-                                            Firestore.instance
-                                                .collection("Shops Details")
-                                                .document(Username)
-                                                .setData({
-                                              key: controller.text,
-                                            }, merge: true);
+                                          onPressed: () async {
+                                            await Add_ProfileData(key, controller.text);
                                             if (controller.text != '') {
                                               Navigator.pop(context, true);
                                             }

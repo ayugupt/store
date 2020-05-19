@@ -37,7 +37,9 @@ dependencies:
   shared_preferences: ^0.5.7+2
   printing: ^3.4.0
   hexcolor:
-  image_picker: 
+  image_picker:
+  firebase_storage:
+
 
 dev_dependencies:
   flutter_test:
