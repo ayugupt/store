@@ -5,6 +5,7 @@ import 'package:flutter_auth/model/cloud_firebase.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_auth/pages/itemData.dart';
 
 Firestore_service firestore_service = new Firestore_service();
 
@@ -51,9 +52,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
         profileData["Address"] = Shopdata["Address"];
       });
     });
-    Username=loggedInUser.displayName;
-    String UniqueiD=loggedInUser.uid;
-    Firestore.instance.collection("Shopitems/$Username/$UniqueiD").snapshots().listen((data) {
+    Username = loggedInUser.displayName;
+    String UniqueiD = loggedInUser.uid;
+    Firestore.instance
+        .collection("Shopitems/$Username/$UniqueiD")
+        .snapshots()
+        .listen((data) {
       setState(() {
         itemData = data.documents;
         gotData = true;
@@ -61,7 +65,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     });
   }
 
-  Future<List> start() async{
+  Future<List> start() async {
     final Username = await loggedInUser.displayName;
     Useremail = await loggedInUser.email;
     setState(() {});
@@ -95,23 +99,23 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
 
   List<DocumentSnapshot> searchResults;
 
-  Add_ProfileData(String key,String addedtext) async{
+  Add_ProfileData(String key, String addedtext) async {
     await getCurrentUser();
     await Firestore.instance
         .collection("Shops Details")
         .document(loggedInUser.displayName)
         .setData({
-      key : addedtext,
+      key: addedtext,
     }, merge: true);
   }
+
   @override
   void initState() {
     getCurrentUser().then((_) {
       start();
     });
-    Username=getCurrentUser().toString();
+    Username = getCurrentUser().toString();
     tabController = new TabController(length: 2, initialIndex: 0, vsync: this);
-
 
     searchController.addListener(() {
       searchResults = new List<DocumentSnapshot>();
@@ -227,7 +231,14 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
           },
           body: TabBarView(
             controller: tabController,
-            children: <Widget>[details(), gridItems()],
+            children: <Widget>[
+              details(),
+              gotData
+                  ? gridItems()
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    )
+            ],
           )),
       backgroundColor: Colors.grey[200],
       resizeToAvoidBottomInset: false,
@@ -270,7 +281,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     double fontSize = MediaQuery.of(context).size.width * 0.04;
     return GridView.builder(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, childAspectRatio: 1),
+          crossAxisCount: 2, childAspectRatio: 0.7),
       itemCount: searchController.text == ''
           ? itemData.length + 1
           : searchResults.length,
@@ -287,7 +298,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                 color: Colors.grey,
               ))),
               width: MediaQuery.of(context).size.width * 0.5,
-              height: MediaQuery.of(context).size.width * 0.5,
+              //height: MediaQuery.of(context).size.width * 0.5,
             )),
             onTap: () {
               File itemImage;
@@ -301,256 +312,255 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     builder: (BuildContext c) {
                       return StatefulBuilder(builder: (context, setState) {
                         return SimpleDialog(
-                            title: Text("Enter Detials of item:"),
-                            children: <Widget>[
-                              Row(
-                                children: <Widget>[
-                                  Align(
-                                      child: Container(
-                                    child: TextField(
-                                      controller: itemName,
-                                      decoration: InputDecoration(
-                                          hintText: "Item Name",
-                                          hintStyle: TextStyle(
-                                              fontSize:
-                                                  MediaQuery.of(c).size.width *
-                                                      0.03),
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20))),
-                                    ),
-                                    width: MediaQuery.of(c).size.width * 0.35,
-                                  )),
-                                  Align(
-                                      child: Container(
-                                    child: TextField(
-                                      controller: itemQuantity,
-                                      decoration: InputDecoration(
-                                          hintText: "Item Quantity",
-                                          hintStyle: TextStyle(
-                                              fontSize:
-                                                  MediaQuery.of(c).size.width *
-                                                      0.03),
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20))),
-                                      keyboardType:
-                                          TextInputType.numberWithOptions(),
-                                    ),
-                                    width: MediaQuery.of(c).size.width * 0.35,
-                                  ))
-                                ],
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                              ),
-                              SizedBox(
-                                  height: MediaQuery.of(context).size.height *
-                                      0.01),
-                              Row(
-                                children: <Widget>[
-                                  Align(
-                                      child: Container(
-                                    child: TextField(
-                                      controller: itemExpiry,
-                                      decoration: InputDecoration(
-                                          hintText: "Expiry Date",
-                                          hintStyle: TextStyle(
-                                              fontSize:
-                                                  MediaQuery.of(c).size.width *
-                                                      0.03),
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20))),
-                                      keyboardType: TextInputType.datetime,
-                                    ),
-                                    width: MediaQuery.of(c).size.width * 0.35,
-                                  )),
-                                  Align(
-                                      child: Container(
-                                    child: TextField(
-                                      controller: itemPrice,
-                                      decoration: InputDecoration(
-                                          hintText: "Item Price",
-                                          hintStyle: TextStyle(
-                                              fontSize:
-                                                  MediaQuery.of(c).size.width *
-                                                      0.03),
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20))),
-                                      keyboardType: TextInputType.number,
-                                    ),
-                                    width: MediaQuery.of(c).size.width * 0.35,
-                                  ))
-                                ],
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                              ),
-                              SizedBox(
-                                height: MediaQuery.of(c).size.height * 0.02,
-                              ),
-                              Center(
-                                child: PopupMenuButton<String>(
-                                  initialValue: selectedOption,
-                                  onSelected: (selected) {
-                                    if (selected == "Add") {
-                                      final catCon =
-                                          new TextEditingController();
-                                      showDialog(
-                                          barrierDismissible: false,
-                                          context: context,
-                                          builder: (context) {
-                                            return SimpleDialog(
-                                              title:
-                                                  Text("Enter New category:-"),
-                                              children: <Widget>[
-                                                Align(
-                                                    child: Container(
-                                                  child: TextField(
-                                                    controller: catCon,
-                                                  ),
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.4,
-                                                )),
-                                                Row(
-                                                  children: <Widget>[
-                                                    Expanded(
-                                                        child: FlatButton(
-                                                      child: Text(
-                                                        "Done",
+                          title: Text("Enter Details of item:"),
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Align(
+                                    child: Container(
+                                  child: TextField(
+                                    controller: itemName,
+                                    decoration: InputDecoration(
+                                        hintText: "Item Name",
+                                        hintStyle: TextStyle(
+                                            fontSize:
+                                                MediaQuery.of(c).size.width *
+                                                    0.03),
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20))),
+                                  ),
+                                  width: MediaQuery.of(c).size.width * 0.35,
+                                )),
+                                Align(
+                                    child: Container(
+                                  child: TextField(
+                                    controller: itemQuantity,
+                                    decoration: InputDecoration(
+                                        hintText: "Item Quantity",
+                                        hintStyle: TextStyle(
+                                            fontSize:
+                                                MediaQuery.of(c).size.width *
+                                                    0.03),
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20))),
+                                    keyboardType:
+                                        TextInputType.numberWithOptions(),
+                                  ),
+                                  width: MediaQuery.of(c).size.width * 0.35,
+                                ))
+                              ],
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            ),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.01),
+                            Row(
+                              children: <Widget>[
+                                Align(
+                                    child: Container(
+                                  child: TextField(
+                                    controller: itemExpiry,
+                                    decoration: InputDecoration(
+                                        hintText: "Expiry Date",
+                                        hintStyle: TextStyle(
+                                            fontSize:
+                                                MediaQuery.of(c).size.width *
+                                                    0.03),
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20))),
+                                    keyboardType: TextInputType.datetime,
+                                  ),
+                                  width: MediaQuery.of(c).size.width * 0.35,
+                                )),
+                                Align(
+                                    child: Container(
+                                  child: TextField(
+                                    controller: itemPrice,
+                                    decoration: InputDecoration(
+                                        hintText: "Item Price",
+                                        hintStyle: TextStyle(
+                                            fontSize:
+                                                MediaQuery.of(c).size.width *
+                                                    0.03),
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20))),
+                                    keyboardType: TextInputType.number,
+                                  ),
+                                  width: MediaQuery.of(c).size.width * 0.35,
+                                ))
+                              ],
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(c).size.height * 0.02,
+                            ),
+                            Center(
+                              child: PopupMenuButton<String>(
+                                initialValue: selectedOption,
+                                onSelected: (selected) {
+                                  if (selected == "Add") {
+                                    final catCon = new TextEditingController();
+                                    showDialog(
+                                        barrierDismissible: false,
+                                        context: context,
+                                        builder: (context) {
+                                          return SimpleDialog(
+                                            title: Text("Enter New category:-"),
+                                            children: <Widget>[
+                                              Align(
+                                                  child: Container(
+                                                child: TextField(
+                                                  controller: catCon,
+                                                ),
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.4,
+                                              )),
+                                              Row(
+                                                children: <Widget>[
+                                                  Expanded(
+                                                      child: FlatButton(
+                                                    child: Text(
+                                                      "Done",
+                                                      style: TextStyle(
+                                                          color: kPrimaryColor),
+                                                    ),
+                                                    onPressed: () {
+                                                      if (catCon.text != '') {
+                                                        Navigator.pop(
+                                                            context, true);
+                                                      }
+                                                    },
+                                                  )),
+                                                  Expanded(
+                                                      child: FlatButton(
+                                                    child: Text("Cancel",
                                                         style: TextStyle(
                                                             color:
-                                                                kPrimaryColor),
-                                                      ),
-                                                      onPressed: () {
-                                                        if (catCon.text != '') {
-                                                          Navigator.pop(
-                                                              context, true);
-                                                        }
-                                                      },
-                                                    )),
-                                                    Expanded(
-                                                        child: FlatButton(
-                                                      child: Text("Cancel",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  kPrimaryColor)),
-                                                      onPressed: () {
-                                                        Navigator.pop(c, false);
-                                                      },
-                                                    ))
-                                                  ],
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                )
-                                              ],
-                                            );
-                                          }).then((p) {
-                                        if (p) {
-                                          categories.add(catCon.text);
-                                          categories[categories.length - 2] =
-                                              categories[categories.length - 1];
-                                          categories[categories.length - 1] =
-                                              "Add";
-                                          catCon.text = '';
-                                        }
-                                      });
-                                    }
-                                    setState(() {
-                                      selectedOption = selected;
-                                    });
-                                  },
-                                  itemBuilder: (BuildContext cnt) {
-                                    return categories.map((category) {
-                                      return PopupMenuItem<String>(
-                                        child: Text(category),
-                                        value: category,
-                                      );
-                                    }).toList();
-                                  },
-                                  child: Text(selectedOption == null ||
-                                          selectedOption == "Add"
-                                      ? "Choose category"
-                                      : selectedOption),
-                                ),
-                              ),
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.02,
-                              ),
-                              Center(
-                                child: GestureDetector(
-                                    child: Container(
-                                      child: itemImage == null
-                                          ? Center(
-                                              child: Icon(
-                                              Icons.add_a_photo,
-                                            ))
-                                          : Image.file(itemImage,
-                                              fit: BoxFit.cover),
-                                      width: MediaQuery.of(context).size.width *
-                                          0.3,
-                                      height:
-                                          MediaQuery.of(context).size.width *
-                                              0.3,
-                                      color: kPrimaryLightColor,
-                                    ),
-                                    onTap: () {
-                                      takeItemImage().then((img) {
-                                        setState (() async {
-                                          itemImage = img;
-                                        });
-                                      });
-                                    }),
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  Expanded(
-                                      child: FlatButton(
-                                    child: Text(
-                                      "Done",
-                                      style: TextStyle(color: kPrimaryColor),
-                                    ),
-                                    onPressed: () async {
-                                      if (itemName.text != '' &&
-                                          itemQuantity.text != '' &&
-                                          selectedOption != null &&
-                                          selectedOption != "Add" &&
-                                          itemImage != null) {
-                                        Navigator.pop(context, true);
-                                        String url= await firestore_service.SaveImage(itemImage,itemName.text);
-                                        print(url);
+                                                                kPrimaryColor)),
+                                                    onPressed: () {
+                                                      Navigator.pop(c, false);
+                                                    },
+                                                  ))
+                                                ],
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                              )
+                                            ],
+                                          );
+                                        }).then((p) {
+                                      if (p) {
+                                        categories.add(catCon.text);
+                                        categories[categories.length - 2] =
+                                            categories[categories.length - 1];
+                                        categories[categories.length - 1] =
+                                            "Add";
+                                        catCon.text = '';
                                       }
-                                    },
-                                  )),
-                                  Expanded(
-                                      child: FlatButton(
-                                    child: Text("Cancel",
-                                        style: TextStyle(color: kPrimaryColor)),
-                                    onPressed: () {
-                                      Navigator.pop(c, false);
-                                    },
-                                  ))
-                                ],
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                              )
-                            ],
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)));
+                                    });
+                                  }
+                                  setState(() {
+                                    selectedOption = selected;
+                                  });
+                                },
+                                itemBuilder: (BuildContext cnt) {
+                                  return categories.map((category) {
+                                    return PopupMenuItem<String>(
+                                      child: Text(category),
+                                      value: category,
+                                    );
+                                  }).toList();
+                                },
+                                child: Text(selectedOption == null ||
+                                        selectedOption == "Add"
+                                    ? "Choose category"
+                                    : selectedOption),
+                              ),
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.02,
+                            ),
+                            Center(
+                              child: GestureDetector(
+                                  child: Container(
+                                    child: itemImage == null
+                                        ? Center(
+                                            child: Icon(
+                                            Icons.add_a_photo,
+                                          ))
+                                        : Image.file(itemImage,
+                                            fit: BoxFit.cover),
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.3,
+                                    height:
+                                        MediaQuery.of(context).size.width * 0.3,
+                                    color: kPrimaryLightColor,
+                                  ),
+                                  onTap: () {
+                                    takeItemImage().then((img) {
+                                      setState(() {
+                                        itemImage = img;
+                                      });
+                                    });
+                                  }),
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                    child: FlatButton(
+                                  child: Text(
+                                    "Done",
+                                    style: TextStyle(color: kPrimaryColor),
+                                  ),
+                                  onPressed: () async {
+                                    if (itemName.text != '' &&
+                                        itemQuantity.text != '' &&
+                                        selectedOption != null &&
+                                        selectedOption != "Add" &&
+                                        itemImage != null) {
+                                      Navigator.pop(context, true);
+                                    }
+                                  },
+                                )),
+                                Expanded(
+                                    child: FlatButton(
+                                  child: Text("Cancel",
+                                      style: TextStyle(color: kPrimaryColor)),
+                                  onPressed: () {
+                                    Navigator.pop(c, false);
+                                  },
+                                ))
+                              ],
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            )
+                          ],
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          contentPadding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * 0.02,
+                              right: MediaQuery.of(context).size.width * 0.02),
+                        );
                       });
-                    }).then((pop) {
+                    }).then((pop) async {
                   if (pop) {
+                    setState(() {
+                      gotData = false;
+                    });
+                    String url = await firestore_service.SaveImage(
+                        itemImage, itemName.text);
                     firestore_service.Add_Item_Data(
-                      itemName.text,
-                      itemQuantity.text,
-                      selectedOption,
-                      itemPrice.text,
-                      itemExpiry.text,
-                    );
+                        itemName.text,
+                        itemQuantity.text,
+                        selectedOption,
+                        itemPrice.text,
+                        itemExpiry.text,
+                        url);
                   }
                   itemName.text = '';
                   itemQuantity.text = '';
@@ -570,13 +580,37 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             child: Container(
           child: Card(
             child: Stack(children: <Widget>[
-              Container(
-                height: MediaQuery.of(context).size.width * 0.30,
-                decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [kPrimaryLightColor, kPrimaryColor],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight)),
+              GestureDetector(
+                child: Hero(
+                  child: Container(
+                    height: MediaQuery.of(context).size.width * 0.53,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: NetworkImage(itemData[index]["Item Image"]),
+                            fit: BoxFit.cover)),
+                  ),
+                  tag: "item",
+                ),
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (BuildContext context) {
+                    return ItemData(
+                        itemData[index]["Item Name"],
+                        itemData[index]["Item Quantity"],
+                        itemData[index]["Item Category"],
+                        itemData[index]["Item Expiry"],
+                        itemData[index]["Item Price"],
+                        itemData[index]["Item Image"]);
+                  }));
+                },
+              ),
+              Padding(
+                child: Container(
+                  height: MediaQuery.of(context).size.width * 0.15,
+                  color: Colors.black.withOpacity(0.5),
+                ),
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.width * 0.38),
               ),
               Center(
                   child: Column(children: <Widget>[
@@ -587,36 +621,37 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                   searchController.text == ''
                       ? itemData[index]["Item Name"]
                       : searchResults[index]["Item Name"],
-                  style: TextStyle(fontSize: fontSize),
+                  style: TextStyle(
+                      fontSize: fontSize * 1.2, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.width * 0.01,
+                  height: MediaQuery.of(context).size.width * 0.27,
                 ),
                 Text(
                   searchController.text == ''
                       ? "Rs.${itemData[index]["Item Price"]}"
                       : "Rs.${searchResults[index]["Item Price"]}",
-                  style: TextStyle(fontSize: fontSize),
+                  style: TextStyle(fontSize: fontSize, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
                 Text(
                   searchController.text == ''
                       ? itemData[index]["Item Expiry"]
                       : searchResults[index]["Item Expiry"],
-                  style: TextStyle(fontSize: fontSize),
+                  style: TextStyle(fontSize: fontSize, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
                 Text(
                   searchController.text == ''
                       ? itemData[index]["Item Category"]
                       : searchResults[index]["Item Category"],
-                  style: TextStyle(fontSize: fontSize),
+                  style: TextStyle(fontSize: fontSize, color: Colors.white),
                   textAlign: TextAlign.center,
                 ),
                 SizedBox(
-                  height: MediaQuery.of(context).size.width * 0.08,
+                  height: MediaQuery.of(context).size.width * 0.025,
                 ),
                 Text(
                   "Quantity",
@@ -631,6 +666,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           Icons.remove,
                           color: Colors.black,
                         ),
+                        heroTag: "1_$index",
                         onPressed: () async {
                           String quantityString = searchController.text == ''
                               ? itemData[index]["Item Quantity"]
@@ -667,6 +703,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           Icons.add,
                           color: Colors.black,
                         ),
+                        heroTag: "2_$index",
                         onPressed: () async {
                           String quantityString = searchController.text == ''
                               ? itemData[index]["Item Quantity"]
@@ -764,7 +801,7 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
             ]),
           ),
           width: MediaQuery.of(context).size.width * 0.5,
-          height: MediaQuery.of(context).size.width * 0.5,
+          //height: MediaQuery.of(context).size.width * 0.6,
         ));
       },
     );
@@ -773,8 +810,10 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   Widget tile(String key, String title, IconData icon) {
     return ListTile(
       title: Text(title),
-      trailing:
-          Text(profileData[key] == null ? "Add $title" : profileData[key]),
+      trailing: Container(
+        child: Text(profileData[key] == null ? "Add $title" : profileData[key], textAlign: TextAlign.right,),
+        width: MediaQuery.of(context).size.width * 0.5,
+      ),
       leading: Icon(icon),
       onTap: () {
         showModalBottomSheet(
@@ -814,7 +853,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                                 TextStyle(color: kPrimaryColor),
                                           ),
                                           onPressed: () async {
-                                            await Add_ProfileData(key, controller.text);
+                                            await Add_ProfileData(
+                                                key, controller.text);
                                             if (controller.text != '') {
                                               Navigator.pop(context, true);
                                             }
